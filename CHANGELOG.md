@@ -1,39 +1,64 @@
-# 변경 이력
+# Changelog
 
-## [1.0.1] - 2024-01-XX
+All notable changes to this project will be documented in this file.
 
-### 🐛 Fixed
-- **레이아웃 개선**: 상하/좌우 분할 레이아웃에서 방향성 일관성 문제 해결
-- **노드 겹침 수정**: 상하 레이아웃에서 노드가 겹치는 문제 해결
-- **방향성 유지**: 첫 분할 이후 각 방향별로 일관된 확장 방향 유지
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-### 🎯 Enhanced  
-- **테스트 데이터**: 3레벨 깊이의 포괄적인 테스트 데이터 추가
-- **레이아웃 정확성**: 실제 노드 크기를 고려한 정확한 간격 계산
+## [1.0.2] - 2024-12-06
 
-## [1.0.0] - 2024-12-21
+### Added
+- Screenshots and demo GIF in README
+- GitHub raw links for images to ensure pub.dev compatibility
+- Improved README readability with emojis and cleaner formatting
+- Bilingual documentation (Korean/English)
 
-### 추가
-- 초기 릴리즈 (reactive_mind_map 패키지)
-- 다양한 마인드맵 레이아웃 지원
-  - 오른쪽/왼쪽/위/아래 방향 레이아웃
-  - 원형(Radial) 레이아웃
-  - 좌우/상하 분할 레이아웃
-- 6가지 노드 모양 지원
-  - 둥근 사각형, 원형, 사각형, 다이아몬드, 육각형, 타원
-- 완전한 스타일 커스터마이징
-  - 색상, 텍스트 스타일, 그림자 효과
-  - 연결선 스타일과 애니메이션
-- 풍부한 인터랙션 지원
-  - 탭, 길게 누르기, 더블 탭 이벤트
-  - 확대/축소, 팬 기능
-  - 노드 확장/축소 애니메이션
-- 성능 최적화
-  - 대용량 데이터 처리
-  - 무한 재귀 방지
-  - 효율적인 메모리 관리
-- 종합적인 예제 앱
-- 상세한 문서화
+### Improved
+- Dynamic spacing calculation based on node sizes
+- Better curve control points for connections
+- Code comments with English translations
+- Documentation structure and visual presentation
+
+### Fixed
+- Image display issues on pub.dev by using GitHub raw URLs
+- Code formatting and removed unnecessary comments
+
+## [1.0.1] - 2024-12-06
+
+### Added
+- Dynamic node sizing based on text content
+- Enhanced spacing calculations for better layout
+- Improved connection line rendering
+- Auto-sizing configuration options
+
+### Improved
+- Node overlap prevention
+- Curve connection quality
+- Layout consistency across all directions
+- Performance optimizations
+
+### Fixed
+- Connection point calculations for variable node sizes
+- Layout issues in split arrangements
+- Animation smoothness
+
+## [1.0.0] - 2024-12-06
+
+### Added
+- Initial release of Reactive Mind Map package
+- Multiple layout options (right, left, top, bottom, radial, horizontal, vertical)
+- Six node shapes (rounded rectangle, circle, rectangle, diamond, hexagon, ellipse)
+- Comprehensive styling system with MindMapStyle
+- Interactive features (tap, long press, double tap, expand/collapse)
+- Smooth animations with customizable curves and duration
+- Pan and zoom functionality
+- Rich customization options for colors, fonts, and effects
+- Shadow effects for nodes
+- Connection line customization
+- Comprehensive test suite
+- Example application demonstrating all features
+- MIT License
+- Complete documentation
 
 ### 기술적 특징
 - Flutter 3.0+ 지원
