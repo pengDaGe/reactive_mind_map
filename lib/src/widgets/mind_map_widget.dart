@@ -156,6 +156,7 @@ class _MindMapWidgetState extends State<MindMapWidget>
 
     try {
       _calculateSubtreeHeights(_rootNode);
+      _calculateSubtreeWidths(_rootNode);
       _assignPositions(_rootNode, 0);
 
       if (mounted) {
@@ -176,18 +177,29 @@ class _MindMapWidgetState extends State<MindMapWidget>
     }
   }
 
-  /// 서브트리 높이 계산
+  /// 서브트리 높이 계산 / Calculate subtree heights
   double _calculateSubtreeHeights(MindMapNode node, {Set<String>? visited}) {
     visited ??= <String>{};
 
     if (visited.contains(node.id)) {
-      return widget.style.getNodeSize(node.level) + widget.style.nodeMargin;
+      final nodeSize = widget.style.getActualNodeSize(
+        node.title,
+        node.level,
+        customSize: node.size,
+        customTextStyle: node.textStyle,
+      );
+      return nodeSize.height + widget.style.nodeMargin;
     }
     visited.add(node.id);
 
     if (node.children.isEmpty) {
-      node.subtreeHeight =
-          widget.style.getNodeSize(node.level) + widget.style.nodeMargin;
+      final nodeSize = widget.style.getActualNodeSize(
+        node.title,
+        node.level,
+        customSize: node.size,
+        customTextStyle: node.textStyle,
+      );
+      node.subtreeHeight = nodeSize.height + widget.style.nodeMargin;
       return node.subtreeHeight;
     }
 
@@ -199,12 +211,72 @@ class _MindMapWidgetState extends State<MindMapWidget>
       );
     }
 
+    final nodeSize = widget.style.getActualNodeSize(
+      node.title,
+      node.level,
+      customSize: node.size,
+      customTextStyle: node.textStyle,
+    );
+
+    final additionalMargin = nodeSize.height * 0.3;
+
     node.subtreeHeight = math.max(
       totalChildHeight,
-      widget.style.getNodeSize(node.level) + widget.style.nodeMargin,
+      nodeSize.height + widget.style.nodeMargin + additionalMargin,
     );
 
     return node.subtreeHeight;
+  }
+
+  /// 서브트리 너비 계산 (상하 레이아웃용) / Calculate subtree widths (for vertical layouts)
+  double _calculateSubtreeWidths(MindMapNode node, {Set<String>? visited}) {
+    visited ??= <String>{};
+
+    if (visited.contains(node.id)) {
+      final nodeSize = widget.style.getActualNodeSize(
+        node.title,
+        node.level,
+        customSize: node.size,
+        customTextStyle: node.textStyle,
+      );
+      return nodeSize.width + widget.style.nodeMargin;
+    }
+    visited.add(node.id);
+
+    if (node.children.isEmpty) {
+      final nodeSize = widget.style.getActualNodeSize(
+        node.title,
+        node.level,
+        customSize: node.size,
+        customTextStyle: node.textStyle,
+      );
+      node.subtreeWidth = nodeSize.width + widget.style.nodeMargin;
+      return node.subtreeWidth;
+    }
+
+    double totalChildWidth = 0;
+    for (var child in node.children) {
+      totalChildWidth += _calculateSubtreeWidths(
+        child,
+        visited: Set.from(visited),
+      );
+    }
+
+    final nodeSize = widget.style.getActualNodeSize(
+      node.title,
+      node.level,
+      customSize: node.size,
+      customTextStyle: node.textStyle,
+    );
+
+    final additionalMargin = nodeSize.width * 0.3;
+
+    node.subtreeWidth = math.max(
+      totalChildWidth,
+      nodeSize.width + widget.style.nodeMargin + additionalMargin,
+    );
+
+    return node.subtreeWidth;
   }
 
   /// 노드 위치 할당
@@ -214,6 +286,37 @@ class _MindMapWidgetState extends State<MindMapWidget>
     if (visited.contains(parent.id) || parent.children.isEmpty) return;
     visited.add(parent.id);
 
+    // 부모의 방향성을 고려한 레이아웃 선택
+    if (parent.parentDirection != null && level > 1) {
+      // 부모의 방향성을 유지
+      switch (parent.parentDirection) {
+        case 'top':
+          _assignTopLayout(parent, level);
+          break;
+        case 'bottom':
+          _assignBottomLayout(parent, level);
+          break;
+        case 'left':
+          _assignLeftLayout(parent, level);
+          break;
+        case 'right':
+          _assignRightLayout(parent, level);
+          break;
+        default:
+          _assignLayoutByType(parent, level);
+      }
+    } else {
+      // 기본 레이아웃 적용
+      _assignLayoutByType(parent, level);
+    }
+
+    for (var child in parent.children) {
+      _assignPositions(child, level + 1, visited: Set.from(visited));
+    }
+  }
+
+  /// 레이아웃 타입에 따른 위치 할당
+  void _assignLayoutByType(MindMapNode parent, int level) {
     switch (widget.style.layout) {
       case MindMapLayout.right:
         _assignRightLayout(parent, level);
@@ -237,15 +340,44 @@ class _MindMapWidgetState extends State<MindMapWidget>
         _assignVerticalLayout(parent, level);
         break;
     }
-
-    for (var child in parent.children) {
-      _assignPositions(child, level + 1, visited: Set.from(visited));
-    }
   }
 
-  /// 오른쪽 방향 레이아웃
+  /// 동적 레벨 간격 계산 (노드 크기 고려) / Calculate dynamic level spacing considering node sizes
+  double _calculateDynamicSpacing(MindMapNode parent, int level) {
+    final parentSize = widget.style.getActualNodeSize(
+      parent.title,
+      parent.level,
+      customSize: parent.size,
+      customTextStyle: parent.textStyle,
+    );
+
+    // 자식 노드들의 평균 크기 계산 / Calculate average size of child nodes
+    double maxChildSize = 0;
+    for (var child in parent.children) {
+      final childSize = widget.style.getActualNodeSize(
+        child.title,
+        child.level,
+        customSize: child.size,
+        customTextStyle: child.textStyle,
+      );
+      maxChildSize = math.max(
+        maxChildSize,
+        math.max(childSize.width, childSize.height),
+      );
+    }
+
+    // 기본 간격 + 부모 노드 크기 + 자식 노드 크기 + 여유 공간 / Base spacing + parent size + child size + margin
+    final baseSpacing = widget.style.levelSpacing;
+    final parentMaxSize = math.max(parentSize.width, parentSize.height);
+    final additionalSpacing = (parentMaxSize + maxChildSize) / 2 + 40;
+
+    return math.max(baseSpacing, additionalSpacing + 80);
+  }
+
+  /// 오른쪽 방향 레이아웃 / Right direction layout
   void _assignRightLayout(MindMapNode parent, int level) {
-    final x = _rootPosition.dx + (level + 1) * widget.style.levelSpacing;
+    final dynamicSpacing = _calculateDynamicSpacing(parent, level);
+    final x = parent.targetPosition.dx + dynamicSpacing;
     double totalHeight = parent.children.fold(
       0.0,
       (sum, child) => sum + child.subtreeHeight,
@@ -258,14 +390,16 @@ class _MindMapWidgetState extends State<MindMapWidget>
         child.targetPosition = Offset(x, childCenterY);
         child.position = child.targetPosition;
         child.hasFixedPosition = true;
+        child.parentDirection = 'right';
       }
       currentY += child.subtreeHeight;
     }
   }
 
-  /// 왼쪽 방향 레이아웃
+  /// 왼쪽 방향 레이아웃 / Left direction layout
   void _assignLeftLayout(MindMapNode parent, int level) {
-    final x = _rootPosition.dx - (level + 1) * widget.style.levelSpacing;
+    final dynamicSpacing = _calculateDynamicSpacing(parent, level);
+    final x = parent.targetPosition.dx - dynamicSpacing;
     double totalHeight = parent.children.fold(
       0.0,
       (sum, child) => sum + child.subtreeHeight,
@@ -278,58 +412,60 @@ class _MindMapWidgetState extends State<MindMapWidget>
         child.targetPosition = Offset(x, childCenterY);
         child.position = child.targetPosition;
         child.hasFixedPosition = true;
+        child.parentDirection = 'left';
       }
       currentY += child.subtreeHeight;
     }
   }
 
-  /// 위쪽 방향 레이아웃
+  /// 위쪽 방향 레이아웃 / Top direction layout
   void _assignTopLayout(MindMapNode parent, int level) {
-    final y = _rootPosition.dy - (level + 1) * widget.style.levelSpacing;
+    final dynamicSpacing = _calculateDynamicSpacing(parent, level);
+    final y = parent.targetPosition.dy - dynamicSpacing;
     double totalWidth = parent.children.fold(
       0.0,
-      (sum, child) =>
-          sum + widget.style.getNodeSize(child.level) + widget.style.nodeMargin,
+      (sum, child) => sum + child.subtreeWidth,
     );
     double currentX = parent.targetPosition.dx - totalWidth / 2;
 
     for (var child in parent.children) {
       if (!child.hasFixedPosition) {
-        final childSize = widget.style.getNodeSize(child.level);
-        final childCenterX = currentX + childSize / 2;
+        final childCenterX = currentX + child.subtreeWidth / 2;
         child.targetPosition = Offset(childCenterX, y);
         child.position = child.targetPosition;
         child.hasFixedPosition = true;
-        currentX += childSize + widget.style.nodeMargin;
+        child.parentDirection = 'top';
       }
+      currentX += child.subtreeWidth;
     }
   }
 
-  /// 아래쪽 방향 레이아웃
+  /// 아래쪽 방향 레이아웃 / Bottom direction layout
   void _assignBottomLayout(MindMapNode parent, int level) {
-    final y = _rootPosition.dy + (level + 1) * widget.style.levelSpacing;
+    final dynamicSpacing = _calculateDynamicSpacing(parent, level);
+    final y = parent.targetPosition.dy + dynamicSpacing;
     double totalWidth = parent.children.fold(
       0.0,
-      (sum, child) =>
-          sum + widget.style.getNodeSize(child.level) + widget.style.nodeMargin,
+      (sum, child) => sum + child.subtreeWidth,
     );
     double currentX = parent.targetPosition.dx - totalWidth / 2;
 
     for (var child in parent.children) {
       if (!child.hasFixedPosition) {
-        final childSize = widget.style.getNodeSize(child.level);
-        final childCenterX = currentX + childSize / 2;
+        final childCenterX = currentX + child.subtreeWidth / 2;
         child.targetPosition = Offset(childCenterX, y);
         child.position = child.targetPosition;
         child.hasFixedPosition = true;
-        currentX += childSize + widget.style.nodeMargin;
+        child.parentDirection = 'bottom';
       }
+      currentX += child.subtreeWidth;
     }
   }
 
-  /// 원형 방향 레이아웃
+  /// 원형 방향 레이아웃 / Radial layout
   void _assignRadialLayout(MindMapNode parent, int level) {
-    final radius = (level + 1) * widget.style.levelSpacing;
+    final dynamicSpacing = _calculateDynamicSpacing(parent, level);
+    final radius = dynamicSpacing * 0.8;
     final angleStep = (2 * math.pi) / parent.children.length;
 
     for (int i = 0; i < parent.children.length; i++) {
@@ -345,28 +481,56 @@ class _MindMapWidgetState extends State<MindMapWidget>
     }
   }
 
-  /// 수평 방향 레이아웃 (좌우로 분할)
+  /// 수평 방향 레이아웃 (좌우로 분할) / Horizontal layout (split left-right)
   void _assignHorizontalLayout(MindMapNode parent, int level) {
-    final leftChildren =
-        parent.children.take((parent.children.length / 2).ceil()).toList();
-    final rightChildren = parent.children.skip(leftChildren.length).toList();
+    // 첫 번째 레벨에서만 좌우 분할, 이후는 각 방향으로 계속 / Split only at first level, continue in direction afterwards
+    if (level == 0) {
+      final leftChildren =
+          parent.children.take((parent.children.length / 2).ceil()).toList();
+      final rightChildren = parent.children.skip(leftChildren.length).toList();
 
-    // 왼쪽 자식들
-    _assignChildrenToSide(leftChildren, parent, level, -1);
-    // 오른쪽 자식들
-    _assignChildrenToSide(rightChildren, parent, level, 1);
+      _assignChildrenToSide(leftChildren, parent, level, -1);
+      for (var child in leftChildren) {
+        child.parentDirection = 'left';
+      }
+
+      _assignChildrenToSide(rightChildren, parent, level, 1);
+      for (var child in rightChildren) {
+        child.parentDirection = 'right';
+      }
+    } else {
+      if (parent.parentDirection == 'left') {
+        _assignLeftLayout(parent, level);
+      } else {
+        _assignRightLayout(parent, level);
+      }
+    }
   }
 
-  /// 수직 방향 레이아웃 (위아래로 분할)
+  /// 수직 방향 레이아웃 (위아래로 분할) / Vertical layout (split top-bottom)
   void _assignVerticalLayout(MindMapNode parent, int level) {
-    final topChildren =
-        parent.children.take((parent.children.length / 2).ceil()).toList();
-    final bottomChildren = parent.children.skip(topChildren.length).toList();
+    // 첫 번째 레벨에서만 상하 분할, 이후는 각 방향으로 계속 / Split only at first level, continue in direction afterwards
+    if (level == 0) {
+      final topChildren =
+          parent.children.take((parent.children.length / 2).ceil()).toList();
+      final bottomChildren = parent.children.skip(topChildren.length).toList();
 
-    // 위쪽 자식들
-    _assignChildrenVertically(topChildren, parent, level, -1);
-    // 아래쪽 자식들
-    _assignChildrenVertically(bottomChildren, parent, level, 1);
+      _assignChildrenVertically(topChildren, parent, level, -1);
+      for (var child in topChildren) {
+        child.parentDirection = 'top';
+      }
+
+      _assignChildrenVertically(bottomChildren, parent, level, 1);
+      for (var child in bottomChildren) {
+        child.parentDirection = 'bottom';
+      }
+    } else {
+      if (parent.parentDirection == 'top') {
+        _assignTopLayout(parent, level);
+      } else {
+        _assignBottomLayout(parent, level);
+      }
+    }
   }
 
   /// 한쪽으로 자식 노드들 배치
@@ -376,9 +540,8 @@ class _MindMapWidgetState extends State<MindMapWidget>
     int level,
     int direction,
   ) {
-    final x =
-        parent.targetPosition.dx +
-        direction * (level + 1) * widget.style.levelSpacing;
+    final dynamicSpacing = _calculateDynamicSpacing(parent, level);
+    final x = parent.targetPosition.dx + direction * dynamicSpacing;
     double totalHeight = children.fold(
       0.0,
       (sum, child) => sum + child.subtreeHeight,
@@ -403,25 +566,22 @@ class _MindMapWidgetState extends State<MindMapWidget>
     int level,
     int direction,
   ) {
-    final y =
-        parent.targetPosition.dy +
-        direction * (level + 1) * widget.style.levelSpacing;
+    final dynamicSpacing = _calculateDynamicSpacing(parent, level);
+    final y = parent.targetPosition.dy + direction * dynamicSpacing;
     double totalWidth = children.fold(
       0.0,
-      (sum, child) =>
-          sum + widget.style.getNodeSize(child.level) + widget.style.nodeMargin,
+      (sum, child) => sum + child.subtreeWidth,
     );
     double currentX = parent.targetPosition.dx - totalWidth / 2;
 
     for (var child in children) {
       if (!child.hasFixedPosition) {
-        final childSize = widget.style.getNodeSize(child.level);
-        final childCenterX = currentX + childSize / 2;
+        final childCenterX = currentX + child.subtreeWidth / 2;
         child.targetPosition = Offset(childCenterX, y);
         child.position = child.targetPosition;
         child.hasFixedPosition = true;
-        currentX += childSize + widget.style.nodeMargin;
       }
+      currentX += child.subtreeWidth;
     }
   }
 
@@ -611,13 +771,20 @@ class _MindMapWidgetState extends State<MindMapWidget>
     return widgets;
   }
 
-  /// 개별 노드 위젯 빌드
+  /// 개별 노드 위젯 빌드 / Build individual node widget
   Widget _buildNodeWidget(MindMapNode node) {
     final isSelected = _selectedNodeId == node.id;
-    final nodeSize = widget.style.getNodeSize(node.level);
+
+    // 동적 크기 계산 / Calculate dynamic size
+    final actualSize = widget.style.getActualNodeSize(
+      node.title,
+      node.level,
+      customSize: node.size,
+      customTextStyle: node.textStyle,
+    );
     final textSize = widget.style.getTextSize(node.level);
 
-    // 색상 결정
+    // 색상 결정 / Determine colors
     final nodeColor = node.color;
     final textColor = node.textColor ?? widget.style.defaultTextStyle.color;
     final borderColor =
@@ -626,8 +793,8 @@ class _MindMapWidgetState extends State<MindMapWidget>
 
     return Positioned(
       key: ValueKey('positioned_${node.id}'),
-      left: node.position.dx - nodeSize / 2,
-      top: node.position.dy - nodeSize / 2,
+      left: node.position.dx - actualSize.width / 2,
+      top: node.position.dy - actualSize.height / 2,
       child: GestureDetector(
         onTap: () {
           if (node.hasChildren) {
@@ -650,8 +817,8 @@ class _MindMapWidgetState extends State<MindMapWidget>
         },
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          width: nodeSize,
-          height: nodeSize,
+          width: actualSize.width,
+          height: actualSize.height,
           child: CustomPaint(
             painter: _NodeWidgetPainter(
               shape: widget.style.nodeShape,
@@ -668,7 +835,7 @@ class _MindMapWidgetState extends State<MindMapWidget>
               children: [
                 Center(
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: widget.style.textPadding,
                     child: Text(
                       node.title,
                       textAlign: TextAlign.center,

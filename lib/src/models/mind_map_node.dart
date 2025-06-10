@@ -48,6 +48,9 @@ class MindMapNode {
   /// 서브트리 높이
   double subtreeHeight;
 
+  /// 서브트리 너비 (상하 레이아웃용)
+  double subtreeWidth;
+
   /// 최소 Y 좌표
   double minY;
 
@@ -56,6 +59,9 @@ class MindMapNode {
 
   /// 노드 레벨
   int level;
+
+  /// 부모와의 방향 관계 (방향성 일관성을 위해)
+  String? parentDirection;
 
   /// 사용자 정의 데이터
   final Map<String, dynamic>? customData;
@@ -76,9 +82,11 @@ class MindMapNode {
     this.isAnimating = false,
     this.hasFixedPosition = false,
     this.subtreeHeight = 0,
+    this.subtreeWidth = 0,
     this.minY = 0,
     this.maxY = 0,
     this.level = 0,
+    this.parentDirection,
     this.customData,
   });
 

@@ -1,230 +1,237 @@
-# Reactive Mind Map
+# Reactive Mind Map / 반응형 마인드맵
 
 [![pub package](https://img.shields.io/pub/v/reactive_mind_map.svg)](https://pub.dev/packages/reactive_mind_map)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Flutter를 위한 완전히 커스터마이징 가능한 인터랙티브 마인드맵 위젯입니다.
+A highly customizable and interactive mind map package for Flutter with multiple layouts, dynamic sizing, and rich styling options.
 
-## 특징
+Flutter용 다중 레이아웃, 동적 크기 조절, 다양한 스타일링 옵션을 제공하는 고도로 커스터마이징 가능한 인터랙티브 마인드맵 패키지입니다.
 
-🎨 **완전한 커스터마이징**
-- 노드 모양 선택 (둥근 사각형, 원형, 다이아몬드, 육각형 등)
-- 색상, 텍스트 스타일, 그림자 효과 커스터마이징
-- 연결선 스타일과 애니메이션 설정
+## Screenshots / 스크린샷
 
-🎯 **다양한 레이아웃**
-- 오른쪽/왼쪽/위/아래 방향 레이아웃
-- 원형(Radial) 레이아웃
-- 좌우/상하 분할 레이아웃
+<p align="center">
+  <img src="screenshots/mindmap_demo.png" alt="Reactive Mind Map Demo" width="800"/>
+</p>
 
-⚡ **부드러운 애니메이션**
-- 노드 확장/축소 애니메이션
-- 커스터마이징 가능한 애니메이션 곡선과 지속시간
+*Multiple layouts and customization options / 다양한 레이아웃과 커스터마이징 옵션*
 
-🖱️ **풍부한 인터랙션**
-- 탭, 길게 누르기, 더블 탭 이벤트
-- 확대/축소, 팬 기능
-- 노드 확장/축소 상태 추적
+## Demo / 데모
 
-## 설치
+<p align="center">
+  <img src="screenshots/mindmap_animation.gif" alt="Interactive Mind Map Animation" width="600"/>
+</p>
+
+*Interactive expand/collapse and smooth animations / 인터랙티브 확장/축소 및 부드러운 애니메이션*
+
+## Features / 기능
+
+### Layouts / 레이아웃
+- **Right Direction** / **오른쪽 방향**: Traditional right-expanding layout / 전통적인 오른쪽 확장 레이아웃
+- **Left Direction** / **왼쪽 방향**: Left-expanding layout / 왼쪽 확장 레이아웃  
+- **Top Direction** / **위쪽 방향**: Upward-expanding layout / 위쪽 확장 레이아웃
+- **Bottom Direction** / **아래쪽 방향**: Downward-expanding layout / 아래쪽 확장 레이아웃
+- **Radial** / **방사형**: Circular arrangement around root / 루트 주위 원형 배치
+- **Horizontal Split** / **수평 분할**: Left-right split from root / 루트에서 좌우 분할
+- **Vertical Split** / **수직 분할**: Top-bottom split from root / 루트에서 상하 분할
+
+### Node Shapes / 노드 모양
+- **Rounded Rectangle** / **둥근 직사각형**: Default rounded corners / 기본 둥근 모서리
+- **Circle** / **원**: Perfect circle shape / 완전한 원 모양
+- **Rectangle** / **직사각형**: Sharp rectangular corners / 날카로운 직사각형 모서리
+- **Diamond** / **다이아몬드**: Diamond/rhombus shape / 다이아몬드/마름모 모양
+- **Hexagon** / **육각형**: Six-sided polygon / 6각형 다각형
+- **Ellipse** / **타원**: Oval/elliptical shape / 타원형 모양
+
+### Customization / 커스터마이징
+- **Dynamic Node Sizing** / **동적 노드 크기**: Automatic sizing based on text content / 텍스트 내용에 따른 자동 크기 조절
+- **Custom Colors** / **커스텀 색상**: Node, text, and border colors / 노드, 텍스트, 테두리 색상
+- **Rich Typography** / **풍부한 타이포그래피**: Font styles, sizes, and effects / 폰트 스타일, 크기, 효과
+- **Animation Control** / **애니메이션 제어**: Customizable duration and curves / 커스터마이징 가능한 지속 시간과 곡선
+- **Shadow Effects** / **그림자 효과**: Configurable node shadows / 설정 가능한 노드 그림자
+
+### Interactions / 인터랙션
+- **Tap Events** / **탭 이벤트**: Node selection and expansion / 노드 선택 및 확장
+- **Long Press** / **길게 누르기**: Custom long press actions / 커스텀 길게 누르기 액션
+- **Double Tap** / **더블 탭**: Double tap gestures / 더블 탭 제스처
+- **Pan & Zoom** / **팬 및 줌**: Interactive navigation / 인터랙티브 내비게이션
+- **Expand/Collapse** / **확장/축소**: Dynamic node visibility / 동적 노드 가시성
+
+## Installation / 설치
+
+Add this to your package's `pubspec.yaml` file:
+`pubspec.yaml` 파일에 다음을 추가하세요:
 
 ```yaml
 dependencies:
   reactive_mind_map: ^1.0.0
 ```
 
-## 기본 사용법
+Then run / 그다음 실행하세요:
+
+```bash
+flutter pub get
+```
+
+## Usage / 사용법
+
+### Basic Example / 기본 예제
 
 ```dart
 import 'package:flutter/material.dart';
 import 'package:reactive_mind_map/reactive_mind_map.dart';
 
-class MyMindMapPage extends StatelessWidget {
+class MyMindMap extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final mindMapData = MindMapData(
       id: 'root',
-      title: 'Flutter',
-      description: 'Flutter 앱 개발',
+      title: 'My Project',
       children: [
-        MindMapData(
-          id: 'ui',
-          title: 'UI & 위젯',
-          children: [
-            MindMapData(id: 'widgets', title: '위젯'),
-            MindMapData(id: 'layouts', title: '레이아웃'),
-          ],
-        ),
-        MindMapData(
-          id: 'state',
-          title: '상태 관리',
-          children: [
-            MindMapData(id: 'provider', title: 'Provider'),
-            MindMapData(id: 'bloc', title: 'BLoC'),
-          ],
-        ),
+        MindMapData(id: '1', title: 'Planning'),
+        MindMapData(id: '2', title: 'Development'),
+        MindMapData(id: '3', title: 'Testing'),
       ],
     );
 
     return Scaffold(
       body: MindMapWidget(
         data: mindMapData,
-        onNodeTap: (node) {
-          print('탭: ${node.title}');
-        },
+        style: MindMapStyle(
+          layout: MindMapLayout.right,
+          nodeShape: NodeShape.roundedRectangle,
+        ),
+        onNodeTap: (node) => print('Tapped: ${node.title}'),
       ),
     );
   }
 }
 ```
 
-## 고급 커스터마이징
-
-### 스타일 커스터마이징
+### Advanced Customization / 고급 커스터마이징
 
 ```dart
-MindMapWidget(
-  data: mindMapData,
-  style: MindMapStyle(
-    layout: MindMapLayout.radial,  // 원형 레이아웃
-    nodeShape: NodeShape.circle,   // 원형 노드
-    backgroundColor: Colors.black87,
-    connectionColor: Colors.white54,
-    defaultNodeColors: [
-      Colors.blue[400]!,
-      Colors.purple[400]!,
-      Colors.green[400]!,
-    ],
-    animationDuration: Duration(milliseconds: 800),
-    animationCurve: Curves.elasticOut,
-  ),
-)
-```
+final customStyle = MindMapStyle(
+  layout: MindMapLayout.radial,
+  nodeShape: NodeShape.circle,
+  enableAutoSizing: true,
+  minNodeWidth: 80.0,
+  maxNodeWidth: 200.0,
+  connectionColor: Colors.blue,
+  connectionWidth: 3.0,
+  animationDuration: Duration(milliseconds: 600),
+  enableNodeShadow: true,
+  defaultNodeColors: [
+    Colors.blue,
+    Colors.green,
+    Colors.orange,
+    Colors.purple,
+  ],
+);
 
-### 다양한 레이아웃
-
-```dart
-// 오른쪽 방향 (기본)
-MindMapStyle(layout: MindMapLayout.right)
-
-// 원형 레이아웃
-MindMapStyle(layout: MindMapLayout.radial)
-
-// 상하 분할
-MindMapStyle(layout: MindMapLayout.vertical)
-
-// 좌우 분할
-MindMapStyle(layout: MindMapLayout.horizontal)
-```
-
-### 노드 모양 변경
-
-```dart
-MindMapStyle(
-  nodeShape: NodeShape.diamond,  // 다이아몬드
-  // 또는
-  nodeShape: NodeShape.hexagon,  // 육각형
-  nodeShape: NodeShape.circle,   // 원형
-)
-```
-
-### 개별 노드 커스터마이징
-
-```dart
-MindMapData(
-  id: 'custom',
-  title: '특별한 노드',
-  color: Colors.red,
-  textColor: Colors.white,
-  borderColor: Colors.yellow,
-  textStyle: TextStyle(
-    fontSize: 16,
-    fontWeight: FontWeight.bold,
-  ),
-  size: Size(100, 100),
-)
-```
-
-### 이벤트 처리
-
-```dart
-MindMapWidget(
-  data: mindMapData,
+final mindMapWidget = MindMapWidget(
+  data: myData,
+  style: customStyle,
   onNodeTap: (node) {
-    // 노드 탭 이벤트
-    print('탭: ${node.title}');
+    // Handle node tap / 노드 탭 처리
+    print('Node tapped: ${node.title}');
   },
   onNodeLongPress: (node) {
-    // 노드 길게 누르기
-    showDialog(/*...*/);
-  },
-  onNodeDoubleTap: (node) {
-    // 노드 더블 탭
-    print('더블 탭: ${node.title}');
+    // Handle long press / 길게 누르기 처리
+    _showNodeOptions(node);
   },
   onNodeExpandChanged: (node, isExpanded) {
-    // 확장/축소 상태 변경
-    print('${node.title} ${isExpanded ? '확장' : '축소'}');
+    // Handle expand/collapse / 확장/축소 처리
+    print('${node.title} ${isExpanded ? 'expanded' : 'collapsed'}');
   },
-)
+);
 ```
 
-### 뷰어 옵션 설정
+### Custom Node Data / 커스텀 노드 데이터
 
 ```dart
-MindMapWidget(
-  data: mindMapData,
-  canvasSize: Size(3000, 2000),  // 캔버스 크기 설정
-  viewerOptions: InteractiveViewerOptions(
-    minScale: 0.1,
-    maxScale: 5.0,
-    enablePanAndZoom: true,
-    boundaryMargin: EdgeInsets.all(100),
+final customNode = MindMapData(
+  id: 'custom-1',
+  title: 'Custom Node',
+  color: Colors.deepPurple,
+  textColor: Colors.white,
+  borderColor: Colors.yellow,
+  size: Size(120, 80),
+  textStyle: TextStyle(
+    fontWeight: FontWeight.bold,
+    fontSize: 14,
+    decoration: TextDecoration.underline,
   ),
-)
+  customData: {
+    'priority': 'high',
+    'deadline': '2024-12-31',
+    'assignee': 'John Doe',
+  },
+);
 ```
 
-## 사용 가능한 레이아웃
+## API Reference / API 참조
 
-| 레이아웃 | 설명 | 적합한 용도 |
-|---------|------|------------|
-| `right` | 오른쪽으로 확장 | 기본 마인드맵, 조직도 |
-| `left` | 왼쪽으로 확장 | RTL 언어, 특별한 디자인 |
-| `top` | 위쪽으로 확장 | 족보, 상향식 구조 |
-| `bottom` | 아래쪽으로 확장 | 하향식 구조, 결정 트리 |
-| `radial` | 원형으로 확장 | 브레인스토밍, 관계도 |
-| `horizontal` | 좌우로 분할 | 대칭적 구조 |
-| `vertical` | 상하로 분할 | 시간축, 프로세스 |
+### MindMapData
 
-## 사용 가능한 노드 모양
+| Property / 속성 | Type / 타입 | Description / 설명 |
+|-----------------|-------------|-------------------|
+| `id` | `String` | Unique identifier / 고유 식별자 |
+| `title` | `String` | Node display text / 노드 표시 텍스트 |
+| `children` | `List<MindMapData>` | Child nodes / 자식 노드들 |
+| `color` | `Color?` | Node background color / 노드 배경색 |
+| `textColor` | `Color?` | Text color / 텍스트 색상 |
+| `borderColor` | `Color?` | Border color / 테두리 색상 |
+| `size` | `Size?` | Custom node size / 커스텀 노드 크기 |
+| `textStyle` | `TextStyle?` | Text styling / 텍스트 스타일링 |
+| `customData` | `Map<String, dynamic>?` | Additional data / 추가 데이터 |
 
-| 모양 | 설명 | 시각적 특징 |
-|------|------|------------|
-| `roundedRectangle` | 둥근 사각형 (기본) | 현대적, 친근함 |
-| `circle` | 원형 | 부드러움, 완전성 |
-| `rectangle` | 사각형 | 정형성, 전문성 |
-| `diamond` | 다이아몬드 | 결정점, 중요성 |
-| `hexagon` | 육각형 | 기술적, 혁신적 |
-| `ellipse` | 타원 | 자연스러움, 흐름 |
+### MindMapStyle
 
-## 성능 최적화
+| Property / 속성 | Type / 타입 | Default / 기본값 | Description / 설명 |
+|-----------------|-------------|------------------|-------------------|
+| `layout` | `MindMapLayout` | `right` | Layout direction / 레이아웃 방향 |
+| `nodeShape` | `NodeShape` | `roundedRectangle` | Node shape / 노드 모양 |
+| `enableAutoSizing` | `bool` | `true` | Dynamic sizing / 동적 크기 조절 |
+| `minNodeWidth` | `double` | `60.0` | Minimum node width / 최소 노드 너비 |
+| `maxNodeWidth` | `double` | `200.0` | Maximum node width / 최대 노드 너비 |
+| `connectionColor` | `Color` | `Colors.grey` | Connection line color / 연결선 색상 |
+| `connectionWidth` | `double` | `2.5` | Connection line width / 연결선 두께 |
+| `animationDuration` | `Duration` | `500ms` | Animation duration / 애니메이션 지속 시간 |
+| `enableNodeShadow` | `bool` | `true` | Node shadow effect / 노드 그림자 효과 |
 
-- 대용량 데이터 처리를 위한 적응형 간격 조정
-- 무한 재귀 방지 메커니즘
-- 효율적인 애니메이션 관리
-- 메모리 누수 방지
+### Callbacks / 콜백
 
-## 예제
+| Callback / 콜백 | Parameters / 매개변수 | Description / 설명 |
+|-----------------|----------------------|-------------------|
+| `onNodeTap` | `MindMapData node` | Node tap event / 노드 탭 이벤트 |
+| `onNodeLongPress` | `MindMapData node` | Long press event / 길게 누르기 이벤트 |
+| `onNodeDoubleTap` | `MindMapData node` | Double tap event / 더블 탭 이벤트 |
+| `onNodeExpandChanged` | `MindMapData node, bool isExpanded` | Expand/collapse event / 확장/축소 이벤트 |
 
-더 많은 예제는 [example](example/) 폴더를 참조하세요.
+## Performance / 성능
 
-## 기여하기
+- **Optimized Rendering** / **최적화된 렌더링**: Efficient drawing with custom painters / 커스텀 페인터를 사용한 효율적인 그리기
+- **Dynamic Calculations** / **동적 계산**: Smart spacing based on content / 콘텐츠 기반 스마트 간격
+- **Memory Efficient** / **메모리 효율적**: Minimal widget tree overhead / 최소한의 위젯 트리 오버헤드
+- **Smooth Animations** / **부드러운 애니메이션**: Hardware-accelerated transitions / 하드웨어 가속 트랜지션
 
-이슈 제기나 풀 리퀘스트는 언제나 환영합니다!
+## License / 라이선스
 
-## 라이선스
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-MIT License. 자세한 내용은 [LICENSE](LICENSE) 파일을 참조하세요.
+이 프로젝트는 MIT 라이선스 하에 있습니다 - 자세한 내용은 [LICENSE](LICENSE) 파일을 참조하세요.
+
+## Contributing / 기여
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+기여를 환영합니다! 언제든지 Pull Request를 제출해 주세요.
+
+## Issues / 이슈
+
+If you encounter any issues or have feature requests, please file them in the [GitHub Issues](https://github.com/devpark435/reactive_mind_map/issues) section.
+
+이슈가 발생하거나 기능 요청이 있으시면 [GitHub Issues](https://github.com/devpark435/reactive_mind_map/issues) 섹션에 등록해 주세요.
 
 ## 변경 이력
 
