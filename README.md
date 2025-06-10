@@ -10,7 +10,7 @@ Flutter용 다중 레이아웃, 동적 크기 조절, 다양한 스타일링 옵
 ## Screenshots / 스크린샷
 
 <p align="center">
-  <img src="screenshots/mindmap_demo.png" alt="Reactive Mind Map Demo" width="800"/>
+  <img src="https://raw.githubusercontent.com/devpark435/reactive_mind_map/main/screenshots/mindmap_demo.png" alt="Reactive Mind Map Demo" width="800"/>
 </p>
 
 *Multiple layouts and customization options / 다양한 레이아웃과 커스터마이징 옵션*
@@ -18,7 +18,7 @@ Flutter용 다중 레이아웃, 동적 크기 조절, 다양한 스타일링 옵
 ## Demo / 데모
 
 <p align="center">
-  <img src="screenshots/mindmap_animation.gif" alt="Interactive Mind Map Animation" width="600"/>
+  <img src="https://raw.githubusercontent.com/devpark435/reactive_mind_map/main/screenshots/mindmap_animation.gif" alt="Interactive Mind Map Animation" width="600"/>
 </p>
 
 *Interactive expand/collapse and smooth animations / 인터랙티브 확장/축소 및 부드러운 애니메이션*
