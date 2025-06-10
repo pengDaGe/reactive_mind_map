@@ -23,38 +23,28 @@ Flutter용 다중 레이아웃, 동적 크기 조절, 다양한 스타일링 옵
 
 *Interactive expand/collapse and smooth animations / 인터랙티브 확장/축소 및 부드러운 애니메이션*
 
-## Features / 기능
+## Features / 특징
 
-### Layouts / 레이아웃
-- **Right Direction** / **오른쪽 방향**: Traditional right-expanding layout / 전통적인 오른쪽 확장 레이아웃
-- **Left Direction** / **왼쪽 방향**: Left-expanding layout / 왼쪽 확장 레이아웃  
-- **Top Direction** / **위쪽 방향**: Upward-expanding layout / 위쪽 확장 레이아웃
-- **Bottom Direction** / **아래쪽 방향**: Downward-expanding layout / 아래쪽 확장 레이아웃
-- **Radial** / **방사형**: Circular arrangement around root / 루트 주위 원형 배치
-- **Horizontal Split** / **수평 분할**: Left-right split from root / 루트에서 좌우 분할
-- **Vertical Split** / **수직 분할**: Top-bottom split from root / 루트에서 상하 분할
+🎨 **완전한 커스터마이징 / Complete Customization**
+- 노드 모양 선택 (둥근 사각형, 원형, 다이아몬드, 육각형 등) / Node shapes (rounded rectangle, circle, diamond, hexagon, etc.)
+- 색상, 텍스트 스타일, 그림자 효과 커스터마이징 / Colors, text styles, shadow effects customization
+- 동적 노드 크기 조절 / Dynamic node sizing
+- 연결선 스타일과 애니메이션 설정 / Connection line styles and animation settings
 
-### Node Shapes / 노드 모양
-- **Rounded Rectangle** / **둥근 직사각형**: Default rounded corners / 기본 둥근 모서리
-- **Circle** / **원**: Perfect circle shape / 완전한 원 모양
-- **Rectangle** / **직사각형**: Sharp rectangular corners / 날카로운 직사각형 모서리
-- **Diamond** / **다이아몬드**: Diamond/rhombus shape / 다이아몬드/마름모 모양
-- **Hexagon** / **육각형**: Six-sided polygon / 6각형 다각형
-- **Ellipse** / **타원**: Oval/elliptical shape / 타원형 모양
+🎯 **다양한 레이아웃 / Multiple Layouts**
+- 오른쪽/왼쪽/위/아래 방향 레이아웃 / Right/Left/Top/Bottom direction layouts
+- 원형(Radial) 레이아웃 / Radial layout
+- 좌우/상하 분할 레이아웃 / Horizontal/Vertical split layouts
 
-### Customization / 커스터마이징
-- **Dynamic Node Sizing** / **동적 노드 크기**: Automatic sizing based on text content / 텍스트 내용에 따른 자동 크기 조절
-- **Custom Colors** / **커스텀 색상**: Node, text, and border colors / 노드, 텍스트, 테두리 색상
-- **Rich Typography** / **풍부한 타이포그래피**: Font styles, sizes, and effects / 폰트 스타일, 크기, 효과
-- **Animation Control** / **애니메이션 제어**: Customizable duration and curves / 커스터마이징 가능한 지속 시간과 곡선
-- **Shadow Effects** / **그림자 효과**: Configurable node shadows / 설정 가능한 노드 그림자
+⚡ **부드러운 애니메이션 / Smooth Animations**
+- 노드 확장/축소 애니메이션 / Node expand/collapse animations
+- 커스터마이징 가능한 애니메이션 곡선과 지속시간 / Customizable animation curves and duration
+- 하드웨어 가속 트랜지션 / Hardware-accelerated transitions
 
-### Interactions / 인터랙션
-- **Tap Events** / **탭 이벤트**: Node selection and expansion / 노드 선택 및 확장
-- **Long Press** / **길게 누르기**: Custom long press actions / 커스텀 길게 누르기 액션
-- **Double Tap** / **더블 탭**: Double tap gestures / 더블 탭 제스처
-- **Pan & Zoom** / **팬 및 줌**: Interactive navigation / 인터랙티브 내비게이션
-- **Expand/Collapse** / **확장/축소**: Dynamic node visibility / 동적 노드 가시성
+🖱️ **풍부한 인터랙션 / Rich Interactions**
+- 탭, 길게 누르기, 더블 탭 이벤트 / Tap, long press, double tap events
+- 확대/축소, 팬 기능 / Pan & zoom functionality
+- 노드 확장/축소 상태 추적 / Node expand/collapse state tracking
 
 ## Installation / 설치
 
@@ -72,9 +62,7 @@ Then run / 그다음 실행하세요:
 flutter pub get
 ```
 
-## Usage / 사용법
-
-### Basic Example / 기본 예제
+## Quick Start / 빠른 시작
 
 ```dart
 import 'package:flutter/material.dart';
@@ -107,113 +95,64 @@ class MyMindMap extends StatelessWidget {
 }
 ```
 
-### Advanced Customization / 고급 커스터마이징
+## Advanced Usage / 고급 사용법
+
+### Custom Styling / 커스텀 스타일링
 
 ```dart
 final customStyle = MindMapStyle(
   layout: MindMapLayout.radial,
   nodeShape: NodeShape.circle,
   enableAutoSizing: true,
-  minNodeWidth: 80.0,
-  maxNodeWidth: 200.0,
   connectionColor: Colors.blue,
-  connectionWidth: 3.0,
   animationDuration: Duration(milliseconds: 600),
-  enableNodeShadow: true,
-  defaultNodeColors: [
-    Colors.blue,
-    Colors.green,
-    Colors.orange,
-    Colors.purple,
-  ],
-);
-
-final mindMapWidget = MindMapWidget(
-  data: myData,
-  style: customStyle,
-  onNodeTap: (node) {
-    // Handle node tap / 노드 탭 처리
-    print('Node tapped: ${node.title}');
-  },
-  onNodeLongPress: (node) {
-    // Handle long press / 길게 누르기 처리
-    _showNodeOptions(node);
-  },
-  onNodeExpandChanged: (node, isExpanded) {
-    // Handle expand/collapse / 확장/축소 처리
-    print('${node.title} ${isExpanded ? 'expanded' : 'collapsed'}');
-  },
+  defaultNodeColors: [Colors.blue, Colors.green, Colors.orange],
 );
 ```
 
-### Custom Node Data / 커스텀 노드 데이터
+### Event Handling / 이벤트 처리
 
 ```dart
-final customNode = MindMapData(
-  id: 'custom-1',
-  title: 'Custom Node',
-  color: Colors.deepPurple,
-  textColor: Colors.white,
-  borderColor: Colors.yellow,
-  size: Size(120, 80),
-  textStyle: TextStyle(
-    fontWeight: FontWeight.bold,
-    fontSize: 14,
-    decoration: TextDecoration.underline,
-  ),
-  customData: {
-    'priority': 'high',
-    'deadline': '2024-12-31',
-    'assignee': 'John Doe',
-  },
+MindMapWidget(
+  data: myData,
+  onNodeTap: (node) => print('Node tapped: ${node.title}'),
+  onNodeLongPress: (node) => _showNodeOptions(node),
+  onNodeExpandChanged: (node, isExpanded) => 
+    print('${node.title} ${isExpanded ? 'expanded' : 'collapsed'}'),
 );
 ```
 
-## API Reference / API 참조
+## Available Options / 사용 가능한 옵션
 
-### MindMapData
+### Layouts / 레이아웃
 
-| Property / 속성 | Type / 타입 | Description / 설명 |
-|-----------------|-------------|-------------------|
-| `id` | `String` | Unique identifier / 고유 식별자 |
-| `title` | `String` | Node display text / 노드 표시 텍스트 |
-| `children` | `List<MindMapData>` | Child nodes / 자식 노드들 |
-| `color` | `Color?` | Node background color / 노드 배경색 |
-| `textColor` | `Color?` | Text color / 텍스트 색상 |
-| `borderColor` | `Color?` | Border color / 테두리 색상 |
-| `size` | `Size?` | Custom node size / 커스텀 노드 크기 |
-| `textStyle` | `TextStyle?` | Text styling / 텍스트 스타일링 |
-| `customData` | `Map<String, dynamic>?` | Additional data / 추가 데이터 |
+| Layout / 레이아웃 | Description / 설명 |
+|-------------------|-------------------|
+| `MindMapLayout.right` | Traditional right-expanding / 오른쪽 확장 |
+| `MindMapLayout.left` | Left-expanding / 왼쪽 확장 |
+| `MindMapLayout.top` | Upward-expanding / 위쪽 확장 |
+| `MindMapLayout.bottom` | Downward-expanding / 아래쪽 확장 |
+| `MindMapLayout.radial` | Circular arrangement / 원형 배치 |
+| `MindMapLayout.horizontal` | Left-right split / 좌우 분할 |
+| `MindMapLayout.vertical` | Top-bottom split / 상하 분할 |
 
-### MindMapStyle
+### Node Shapes / 노드 모양
 
-| Property / 속성 | Type / 타입 | Default / 기본값 | Description / 설명 |
-|-----------------|-------------|------------------|-------------------|
-| `layout` | `MindMapLayout` | `right` | Layout direction / 레이아웃 방향 |
-| `nodeShape` | `NodeShape` | `roundedRectangle` | Node shape / 노드 모양 |
-| `enableAutoSizing` | `bool` | `true` | Dynamic sizing / 동적 크기 조절 |
-| `minNodeWidth` | `double` | `60.0` | Minimum node width / 최소 노드 너비 |
-| `maxNodeWidth` | `double` | `200.0` | Maximum node width / 최대 노드 너비 |
-| `connectionColor` | `Color` | `Colors.grey` | Connection line color / 연결선 색상 |
-| `connectionWidth` | `double` | `2.5` | Connection line width / 연결선 두께 |
-| `animationDuration` | `Duration` | `500ms` | Animation duration / 애니메이션 지속 시간 |
-| `enableNodeShadow` | `bool` | `true` | Node shadow effect / 노드 그림자 효과 |
-
-### Callbacks / 콜백
-
-| Callback / 콜백 | Parameters / 매개변수 | Description / 설명 |
-|-----------------|----------------------|-------------------|
-| `onNodeTap` | `MindMapData node` | Node tap event / 노드 탭 이벤트 |
-| `onNodeLongPress` | `MindMapData node` | Long press event / 길게 누르기 이벤트 |
-| `onNodeDoubleTap` | `MindMapData node` | Double tap event / 더블 탭 이벤트 |
-| `onNodeExpandChanged` | `MindMapData node, bool isExpanded` | Expand/collapse event / 확장/축소 이벤트 |
+| Shape / 모양 | Description / 설명 |
+|--------------|-------------------|
+| `NodeShape.roundedRectangle` | Rounded corners (default) / 둥근 모서리 (기본) |
+| `NodeShape.circle` | Perfect circle / 완전한 원 |
+| `NodeShape.rectangle` | Sharp corners / 날카로운 모서리 |
+| `NodeShape.diamond` | Diamond shape / 다이아몬드 모양 |
+| `NodeShape.hexagon` | Six-sided polygon / 육각형 |
+| `NodeShape.ellipse` | Oval shape / 타원형 |
 
 ## Performance / 성능
 
-- **Optimized Rendering** / **최적화된 렌더링**: Efficient drawing with custom painters / 커스텀 페인터를 사용한 효율적인 그리기
-- **Dynamic Calculations** / **동적 계산**: Smart spacing based on content / 콘텐츠 기반 스마트 간격
-- **Memory Efficient** / **메모리 효율적**: Minimal widget tree overhead / 최소한의 위젯 트리 오버헤드
-- **Smooth Animations** / **부드러운 애니메이션**: Hardware-accelerated transitions / 하드웨어 가속 트랜지션
+- **최적화된 렌더링** / Optimized rendering with custom painters
+- **동적 간격 계산** / Smart spacing based on content
+- **메모리 효율적** / Minimal widget tree overhead
+- **부드러운 애니메이션** / Hardware-accelerated animations
 
 ## License / 라이선스
 
