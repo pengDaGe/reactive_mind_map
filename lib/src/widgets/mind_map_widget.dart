@@ -36,6 +36,9 @@ class MindMapWidget extends StatefulWidget {
   /// 뷰어 설정
   final InteractiveViewerOptions? viewerOptions;
 
+  /// Optional key to capture the full mind map canvas (wraps canvas in RepaintBoundary) to give the user the ability to save the mind map as an image
+  final GlobalKey? captureKey;
+
   /// Whether nodes should be collapsed by default (false = open all nodes)
   final bool isNodesCollapsed;
 
@@ -54,6 +57,7 @@ class MindMapWidget extends StatefulWidget {
     this.viewerOptions,
     this.isNodesCollapsed = false,
     this.initialScale = 1.0,
+    this.captureKey,
   });
 
   @override
@@ -772,18 +776,35 @@ class _MindMapWidgetState extends State<MindMapWidget>
     final viewerOptions =
         widget.viewerOptions ?? const InteractiveViewerOptions();
 
-    final mindMapContent = Container(
-      width: canvasSize.width,
-      height: canvasSize.height,
-      color: widget.style.backgroundColor,
-      child: CustomPaint(
-        painter: MindMapPainter(_rootNode, widget.style),
-        child: Stack(children: _buildAllNodes(_rootNode)),
-      ),
-    );
+    // Wrap the full canvas in a RepaintBoundary if a captureKey is provided
+    final mindMapContent =
+        (widget.captureKey != null)
+            ? RepaintBoundary(
+              key: widget.captureKey,
+              child: Container(
+                width: canvasSize.width,
+                height: canvasSize.height,
+                color: widget.style.backgroundColor,
+                child: CustomPaint(
+                  painter: MindMapPainter(_rootNode, widget.style),
+                  child: Stack(children: _buildAllNodes(_rootNode)),
+                ),
+              ),
+            )
+            : Container(
+              width: canvasSize.width,
+              height: canvasSize.height,
+              color: widget.style.backgroundColor,
+              child: CustomPaint(
+                painter: MindMapPainter(_rootNode, widget.style),
+                child: Stack(children: _buildAllNodes(_rootNode)),
+              ),
+            );
 
     if (viewerOptions.enablePanAndZoom) {
       return InteractiveViewer(
+        // Disable clipping so we can capture the full mind map
+        clipBehavior: Clip.none,
         transformationController: _transformationController,
         constrained: viewerOptions.constrained,
         boundaryMargin: viewerOptions.boundaryMargin,
