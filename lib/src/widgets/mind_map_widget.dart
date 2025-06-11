@@ -36,6 +36,9 @@ class MindMapWidget extends StatefulWidget {
   /// 뷰어 설정
   final InteractiveViewerOptions? viewerOptions;
 
+  /// Whether nodes should be collapsed by default (false = open all nodes)
+  final bool isNodesCollapsed;
+
   const MindMapWidget({
     super.key,
     required this.data,
@@ -46,6 +49,7 @@ class MindMapWidget extends StatefulWidget {
     this.onNodeExpandChanged,
     this.canvasSize,
     this.viewerOptions,
+    this.isNodesCollapsed = false,
   });
 
   @override
@@ -91,7 +95,9 @@ class _MindMapWidgetState extends State<MindMapWidget>
   @override
   void didUpdateWidget(MindMapWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.data != widget.data || oldWidget.style != widget.style) {
+    if (oldWidget.data != widget.data ||
+        oldWidget.style != widget.style ||
+        oldWidget.isNodesCollapsed != widget.isNodesCollapsed) {
       _initializeMindMap();
       _calculateRootPosition();
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -117,6 +123,16 @@ class _MindMapWidgetState extends State<MindMapWidget>
       0,
       defaultColors: widget.style.defaultNodeColors,
     );
+    // apply default expansion/collapse to all nodes
+    _applyInitialExpansion(_rootNode);
+  }
+
+  /// Recursively set each node's expanded state based on the isNodesCollapsed flag
+  void _applyInitialExpansion(MindMapNode node) {
+    node.isExpanded = !widget.isNodesCollapsed;
+    for (var child in node.children) {
+      _applyInitialExpansion(child);
+    }
   }
 
   /// 루트 노드 위치 계산
