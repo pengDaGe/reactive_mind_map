@@ -39,6 +39,9 @@ class MindMapWidget extends StatefulWidget {
   /// Whether nodes should be collapsed by default (false = open all nodes)
   final bool isNodesCollapsed;
 
+  /// Initial zoom scale for the mind map (1.0 = no zoom)
+  final double initialScale;
+
   const MindMapWidget({
     super.key,
     required this.data,
@@ -50,6 +53,7 @@ class MindMapWidget extends StatefulWidget {
     this.canvasSize,
     this.viewerOptions,
     this.isNodesCollapsed = false,
+    this.initialScale = 1.0,
   });
 
   @override
@@ -75,6 +79,8 @@ class InteractiveViewerOptions {
 
 class _MindMapWidgetState extends State<MindMapWidget>
     with TickerProviderStateMixin {
+  // Controller to manage initial centering in InteractiveViewer
+  late TransformationController _transformationController;
   late MindMapNode _rootNode;
   final List<AnimationController> _activeAnimations = [];
   String? _selectedNodeId;
@@ -87,9 +93,17 @@ class _MindMapWidgetState extends State<MindMapWidget>
   @override
   void initState() {
     super.initState();
+    // Initialize transformation controller for centering
+    _transformationController = TransformationController();
     _initializeMindMap();
     _calculateRootPosition();
     _calculateLayout();
+    // Center the root after first frame if pan/zoom is enabled
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if ((widget.viewerOptions?.enablePanAndZoom ?? true)) {
+        _centerView();
+      }
+    });
   }
 
   @override
@@ -97,12 +111,17 @@ class _MindMapWidgetState extends State<MindMapWidget>
     super.didUpdateWidget(oldWidget);
     if (oldWidget.data != widget.data ||
         oldWidget.style != widget.style ||
-        oldWidget.isNodesCollapsed != widget.isNodesCollapsed) {
+        oldWidget.isNodesCollapsed != widget.isNodesCollapsed ||
+        oldWidget.initialScale != widget.initialScale) {
       _initializeMindMap();
       _calculateRootPosition();
+      // Re-center after layout updates
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
           _calculateLayout();
+          if ((widget.viewerOptions?.enablePanAndZoom ?? true)) {
+            _centerView();
+          }
         }
       });
     }
@@ -110,6 +129,7 @@ class _MindMapWidgetState extends State<MindMapWidget>
 
   @override
   void dispose() {
+    _transformationController.dispose();
     for (var controller in _activeAnimations) {
       controller.dispose();
     }
@@ -731,6 +751,19 @@ class _MindMapWidgetState extends State<MindMapWidget>
     return null;
   }
 
+  /// Centers the InteractiveViewer so the root node appears in the viewport center at the given scale.
+  void _centerView() {
+    final Size screenSize = MediaQuery.of(context).size;
+    final double scale = widget.initialScale;
+    // compute translation so that rootPosition maps to screen center at the given scale
+    final double tx = screenSize.width / 2 - (_rootPosition.dx * scale);
+    final double ty = screenSize.height / 2 - (_rootPosition.dy * scale);
+    _transformationController.value =
+        Matrix4.identity()
+          ..translate(tx, ty)
+          ..scale(scale);
+  }
+
   @override
   Widget build(BuildContext context) {
     final canvasSize =
@@ -751,6 +784,7 @@ class _MindMapWidgetState extends State<MindMapWidget>
 
     if (viewerOptions.enablePanAndZoom) {
       return InteractiveViewer(
+        transformationController: _transformationController,
         constrained: viewerOptions.constrained,
         boundaryMargin: viewerOptions.boundaryMargin,
         minScale: viewerOptions.minScale,
