@@ -53,7 +53,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  reactive_mind_map: ^1.0.0
+  reactive_mind_map: ^1.0.3
 ```
 
 Then run / 그다음 실행하세요:
@@ -92,6 +92,50 @@ class MyMindMap extends StatelessWidget {
       ),
     );
   }
+}
+```
+
+## 중요 사용법 주의사항 / Important Usage Notes
+
+⚠️ **화면 크기 최적화** / Screen Size Optimization
+- `MindMapWidget`은 기본적으로 화면 크기에 맞게 자동 조정됩니다
+- `Expanded` 위젯 안에서 사용할 때는 추가 설정이 필요하지 않습니다
+- 팬/줌 기능이 기본으로 활성화되어 있어 큰 마인드맵도 쉽게 탐색할 수 있습니다
+
+```dart
+// ✅ 올바른 사용법 - 화면에 맞게 자동 조정
+Widget build(BuildContext context) {
+  return Scaffold(
+    body: MindMapWidget(
+      data: root.value,
+      style: MindMapStyle(
+        layout: MindMapLayout.right,
+        nodeShape: NodeShape.roundedRectangle,
+      ),
+      onNodeTap: (node) => print('Tapped: ${node.title}'),
+    ),
+  );
+}
+
+// ✅ Expanded 안에서 사용하는 경우
+Widget build(BuildContext context) {
+  return Scaffold(
+    body: Column(
+      children: [
+        SomeHeaderWidget(),
+        Expanded(
+          child: MindMapWidget(
+            data: root.value,
+            style: MindMapStyle(
+              layout: MindMapLayout.right,
+              nodeShape: NodeShape.roundedRectangle,
+            ),
+            onNodeTap: (node) => print('Tapped: ${node.title}'),
+          ),
+        ),
+      ],
+    ),
+  );
 }
 ```
 
