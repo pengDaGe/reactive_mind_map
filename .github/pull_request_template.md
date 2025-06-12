@@ -72,7 +72,6 @@ Please check all that apply:
 - [ ] My changes generate no new warnings / 변경사항으로 인한 새로운 경고가 없습니다
 - [ ] I have added tests that prove my fix is effective or that my feature works / 수정사항이나 기능이 작동함을 증명하는 테스트를 추가했습니다
 - [ ] New and existing unit tests pass locally with my changes / 새로운 테스트와 기존 테스트가 로컬에서 통과합니다
-- [ ] I have updated the CHANGELOG.md / CHANGELOG.md를 업데이트했습니다
 
 ## Breaking Changes / 호환성을 깨뜨리는 변경사항
 
