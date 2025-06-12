@@ -1027,7 +1027,7 @@ class _MindMapWidgetState extends State<MindMapWidget>
                       style: (node.textStyle ?? widget.style.defaultTextStyle)
                           .copyWith(color: textColor, fontSize: textSize),
                       maxLines: null,
-                      overflow: TextOverflow.ellipsis,
+                      softWrap: true,
                     ),
                   ),
                 ),
