@@ -230,7 +230,7 @@ class MindMapStyle {
     final textPainter = TextPainter(
       text: TextSpan(text: text, style: textStyle),
       textDirection: TextDirection.ltr,
-      maxLines: 6,
+      maxLines: null,
     );
     textPainter.layout(maxWidth: maxNodeWidth - textPadding.horizontal);
 

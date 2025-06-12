@@ -53,7 +53,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  reactive_mind_map: ^1.0.0
+  reactive_mind_map: ^1.0.3
 ```
 
 Then run / 그다음 실행하세요:
@@ -92,6 +92,50 @@ class MyMindMap extends StatelessWidget {
       ),
     );
   }
+}
+```
+
+## 중요 사용법 주의사항 / Important Usage Notes
+
+⚠️ **화면 크기 최적화** / Screen Size Optimization
+- `MindMapWidget`은 기본적으로 화면 크기에 맞게 자동 조정됩니다
+- `Expanded` 위젯 안에서 사용할 때는 추가 설정이 필요하지 않습니다
+- 팬/줌 기능이 기본으로 활성화되어 있어 큰 마인드맵도 쉽게 탐색할 수 있습니다
+
+```dart
+// ✅ 올바른 사용법 - 화면에 맞게 자동 조정
+Widget build(BuildContext context) {
+  return Scaffold(
+    body: MindMapWidget(
+      data: root.value,
+      style: MindMapStyle(
+        layout: MindMapLayout.right,
+        nodeShape: NodeShape.roundedRectangle,
+      ),
+      onNodeTap: (node) => print('Tapped: ${node.title}'),
+    ),
+  );
+}
+
+// ✅ Expanded 안에서 사용하는 경우
+Widget build(BuildContext context) {
+  return Scaffold(
+    body: Column(
+      children: [
+        SomeHeaderWidget(),
+        Expanded(
+          child: MindMapWidget(
+            data: root.value,
+            style: MindMapStyle(
+              layout: MindMapLayout.right,
+              nodeShape: NodeShape.roundedRectangle,
+            ),
+            onNodeTap: (node) => print('Tapped: ${node.title}'),
+          ),
+        ),
+      ],
+    ),
+  );
 }
 ```
 
@@ -162,9 +206,38 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Contributing / 기여
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+We welcome contributions! Whether you're fixing bugs, adding features, or improving documentation, your help is appreciated.
 
-기여를 환영합니다! 언제든지 Pull Request를 제출해 주세요.
+기여를 환영합니다! 버그 수정, 기능 추가, 문서 개선 등 모든 도움을 감사히 받겠습니다.
+
+### Quick Contributing Guide / 빠른 기여 가이드
+
+1. **🐛 Found a bug?** / 버그를 발견하셨나요?
+   - Check [existing issues](https://github.com/devpark435/reactive_mind_map/issues) first / [기존 이슈들](https://github.com/devpark435/reactive_mind_map/issues)을 먼저 확인하세요
+   - Use our [Bug Report template](https://github.com/devpark435/reactive_mind_map/issues/new?template=bug_report.yml) / [버그 리포트 템플릿](https://github.com/devpark435/reactive_mind_map/issues/new?template=bug_report.yml)을 사용하세요
+
+2. **💡 Have a feature idea?** / 기능 아이디어가 있으신가요?
+   - Use our [Feature Request template](https://github.com/devpark435/reactive_mind_map/issues/new?template=feature_request.yml) / [기능 요청 템플릿](https://github.com/devpark435/reactive_mind_map/issues/new?template=feature_request.yml)을 사용하세요
+
+3. **❓ Need help?** / 도움이 필요하신가요?
+   - Use our [Question template](https://github.com/devpark435/reactive_mind_map/issues/new?template=question.yml) / [질문 템플릿](https://github.com/devpark435/reactive_mind_map/issues/new?template=question.yml)을 사용하세요
+
+4. **🔧 Want to contribute code?** / 코드 기여를 원하시나요?
+   - Read our detailed [**Contributing Guide**](CONTRIBUTING.md) / 상세한 [**기여 가이드**](CONTRIBUTING.md)를 읽어보세요
+   - Fork the repo, make changes, and submit a PR / 저장소를 포크하고 변경사항을 만든 후 PR을 제출하세요
+
+### Development Setup / 개발 환경 설정
+
+```bash
+git clone https://github.com/YOUR_USERNAME/reactive_mind_map.git
+cd reactive_mind_map
+flutter pub get
+flutter run
+```
+
+For detailed development guidelines, coding standards, and contribution process, please see our [**Contributing Guide**](CONTRIBUTING.md).
+
+자세한 개발 가이드라인, 코딩 표준, 기여 과정은 [**기여 가이드**](CONTRIBUTING.md)를 참조하세요.
 
 ## Issues / 이슈
 
