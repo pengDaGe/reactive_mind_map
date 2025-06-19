@@ -5,7 +5,46 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.3] - 2024-12-06
+## [1.0.4] - 2025-06-19
+
+### Added
+- 🎯 **자동 중앙 정렬 기능**: 초기 로드 시 루트 노드가 자동으로 화면 중앙에 위치 / **Auto-centering**: Root node automatically centers on initial load
+- 📏 **초기 줌 스케일 설정**: `initialScale` 속성으로 기본 확대/축소 레벨 조정 가능 / **Initial zoom scale**: `initialScale` property for default zoom level control
+- 📂 **노드 기본 확장 상태**: `isNodesCollapsed` 속성으로 노드 초기 상태 제어 / **Default node expansion**: `isNodesCollapsed` property for initial node state control
+- 📸 **이미지 캡처 기능**: `captureKey` 속성으로 마인드맵을 이미지로 저장 가능 / **Image capture**: `captureKey` property for saving mind map as image
+- 🔄 **TransformationController 지원**: 뷰포트 위치 및 줌 레벨 프로그래밍 제어 / **TransformationController support**: Programmatic viewport and zoom control
+
+### Improved
+- 🔧 **텍스트 렌더링 품질**: `softWrap: true` 적용으로 텍스트 오버플로우 방지 / **Text rendering quality**: `softWrap: true` prevents text overflow
+- ⚡ **초기 로딩 성능**: 자동 중앙 정렬로 사용자 경험 개선 / **Initial loading performance**: Auto-centering improves user experience
+- 🎨 **InteractiveViewer 최적화**: 더 부드러운 팬/줌 인터랙션 / **InteractiveViewer optimization**: Smoother pan/zoom interactions
+- 📱 **반응형 개선**: 다양한 화면 크기에서 더 나은 적응성 / **Responsive improvements**: Better adaptation to various screen sizes
+
+### Fixed
+- ❌ **초기 뷰포트 문제**: 루트 노드가 화면 밖에 위치하는 문제 해결 / **Initial viewport issue**: Fixed root node appearing outside viewport
+- 🔤 **텍스트 잘림 문제**: 긴 텍스트의 표시 오류 해결 / **Text clipping issue**: Fixed display errors with long text
+- 🎯 **노드 포커스 문제**: 사용자가 마인드맵을 찾기 어려운 문제 해결 / **Node focus issue**: Fixed difficulty finding mind map content
+
+### Breaking Changes
+- None - 이 업데이트는 모든 기존 API와 호환됩니다 / This update is fully compatible with existing APIs
+
+### Usage Examples
+```dart
+MindMapWidget(
+  data: yourMindMapData,
+  initialScale: 0.8,           // 초기 80% 줌 레벨
+  isNodesCollapsed: false,     // 모든 노드 기본 확장
+  captureKey: GlobalKey(),     // 이미지 캡처용 키
+  style: MindMapStyle(
+    // ... 기존 스타일 설정
+  ),
+)
+```
+
+### Contributors
+- Special thanks to @TOZXII for the major contributions including auto-centering, initial scale, and image capture features
+
+## [1.0.3] - 2025-06-06
 
 ### Added
 - 실제 노드 위치 기반 동적 캔버스 크기 계산 시스템 / Dynamic canvas sizing system based on actual node positions
@@ -31,7 +70,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `_collectAllVisibleNodes()` 메서드로 효율적인 노드 수집 / Efficient node collection with `_collectAllVisibleNodes()` method
 - README에 중요한 사용법 주의사항 추가 / Added important usage notes to README
 
-## [1.0.2] - 2024-12-06
+## [1.0.2] - 2025-06-13
 
 ### Added
 - Screenshots and demo GIF in README
@@ -49,7 +88,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Image display issues on pub.dev by using GitHub raw URLs
 - Code formatting and removed unnecessary comments
 
-## [1.0.1] - 2024-12-06
+## [1.0.1] - 2025-06-13
 
 ### Added
 - Dynamic node sizing based on text content
@@ -68,7 +107,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Layout issues in split arrangements
 - Animation smoothness
 
-## [1.0.0] - 2024-12-06
+## [1.0.0] - 2025-06-13
 
 ### Added
 - Initial release of Reactive Mind Map package
