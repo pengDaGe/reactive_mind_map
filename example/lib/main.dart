@@ -29,6 +29,7 @@ class _TestScreenState extends State<TestScreen> {
   CameraFocus currentFocus = CameraFocus.rootNode;
   String? targetNodeId;
   String lastAction = '시작';
+  NodeExpandCameraBehavior expandBehavior = NodeExpandCameraBehavior.none;
 
   // 간단한 테스트 데이터
   final mindMapData = MindMapData(
@@ -97,28 +98,50 @@ class _TestScreenState extends State<TestScreen> {
             ),
           ),
 
+          // 🆕 노드 확장 동작 선택
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  '📂 노드 확장 시 카메라 동작:',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 4,
+                  children: [
+                    _buildExpandBehaviorButton(
+                      '❌ 이동없음',
+                      NodeExpandCameraBehavior.none,
+                    ),
+                    _buildExpandBehaviorButton(
+                      '🎯 클릭노드',
+                      NodeExpandCameraBehavior.focusClickedNode,
+                    ),
+                    _buildExpandBehaviorButton(
+                      '👶 자식들만',
+                      NodeExpandCameraBehavior.fitExpandedChildren,
+                    ),
+                    _buildExpandBehaviorButton(
+                      '🌳 전체트리',
+                      NodeExpandCameraBehavior.fitExpandedSubtree,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
           // 상태 표시
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            margin: const EdgeInsets.symmetric(horizontal: 16),
-            decoration: BoxDecoration(
-              color: Colors.blue[50],
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.blue[200]!),
-            ),
+            padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                Text(
-                  '현재: ${_getFocusName()} ${targetNodeId != null ? '→ $targetNodeId' : ''}',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  '마지막 액션: $lastAction',
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                ),
+                Text('현재 포커스: ${_getFocusName()}'),
+                Text('마지막 동작: $lastAction'),
+                Text('확장 동작: ${_getExpandBehaviorName()}'),
               ],
             ),
           ),
@@ -154,6 +177,7 @@ class _TestScreenState extends State<TestScreen> {
                     milliseconds: 1000,
                   ), // 더 긴 애니메이션
                   isNodesCollapsed: false, // 모든 노드 펼쳐져 있음
+                  nodeExpandCameraBehavior: expandBehavior,
                   onNodeTap: (node) {
                     print('탭된 노드: ${node.title} (${node.id})');
                     setState(() {
@@ -203,6 +227,34 @@ class _TestScreenState extends State<TestScreen> {
         return '첫리프';
       case CameraFocus.center:
         return '중앙';
+    }
+  }
+
+  Widget _buildExpandBehaviorButton(
+    String text,
+    NodeExpandCameraBehavior behavior,
+  ) {
+    return ElevatedButton(
+      onPressed: () => setState(() => expandBehavior = behavior),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      ),
+      child: Text(text, style: const TextStyle(fontSize: 12)),
+    );
+  }
+
+  String _getExpandBehaviorName() {
+    switch (expandBehavior) {
+      case NodeExpandCameraBehavior.none:
+        return '❌ 이동없음';
+      case NodeExpandCameraBehavior.focusClickedNode:
+        return '🎯 클릭노드';
+      case NodeExpandCameraBehavior.fitExpandedChildren:
+        return '👶 자식들만';
+      case NodeExpandCameraBehavior.fitExpandedSubtree:
+        return '🌳 전체트리';
     }
   }
 }

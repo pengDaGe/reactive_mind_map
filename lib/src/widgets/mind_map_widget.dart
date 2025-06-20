@@ -64,6 +64,9 @@ class MindMapWidget extends StatefulWidget {
   /// 포커스할 때의 여백 / Margin when focusing
   final EdgeInsets focusMargin;
 
+  /// 노드 확장 시 카메라 동작 / Camera behavior when expanding nodes
+  final NodeExpandCameraBehavior nodeExpandCameraBehavior;
+
   const MindMapWidget({
     super.key,
     required this.data,
@@ -83,6 +86,7 @@ class MindMapWidget extends StatefulWidget {
     this.focusNodeId,
     this.focusAnimation = const Duration(milliseconds: 300),
     this.focusMargin = const EdgeInsets.all(20),
+    this.nodeExpandCameraBehavior = NodeExpandCameraBehavior.none,
   });
 
   @override
@@ -117,6 +121,8 @@ class _MindMapWidgetState extends State<MindMapWidget>
   Size _actualCanvasSize = const Size(1200, 800);
   late Offset _rootPosition;
 
+  bool _isTogglingNode = false;
+
   @override
   void initState() {
     super.initState();
@@ -146,7 +152,9 @@ class _MindMapWidgetState extends State<MindMapWidget>
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
           _calculateCanvasAndLayout();
-          if ((widget.viewerOptions?.enablePanAndZoom ?? true)) {
+          // 🎯 노드 토글로 인한 변경이 아닌 경우에만 자동 카메라 이동
+          if ((widget.viewerOptions?.enablePanAndZoom ?? true) &&
+              !_isTogglingNode) {
             _centerView();
           }
         }
@@ -776,6 +784,9 @@ class _MindMapWidgetState extends State<MindMapWidget>
 
     HapticFeedback.lightImpact();
 
+    // 🎯 노드 토글 상태 설정
+    _isTogglingNode = true;
+
     setState(() {
       node.isExpanded = !node.isExpanded;
 
@@ -798,10 +809,93 @@ class _MindMapWidgetState extends State<MindMapWidget>
       }
     });
 
+    // 🎯 노드 확장 시 카메라 동작 설정에 따라 처리
+    _handleNodeExpandCamera(node);
+
     final originalData = _findOriginalData(node.id);
     if (originalData != null) {
       widget.onNodeExpandChanged?.call(originalData, node.isExpanded);
     }
+
+    // 🎯 토글 완료 후 플래그 리셋 (다음 프레임에서)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _isTogglingNode = false;
+      }
+    });
+  }
+
+  /// 노드 확장 시 카메라 동작 처리 / Handle camera behavior on node expand
+  void _handleNodeExpandCamera(MindMapNode node) {
+    if (!mounted || !(widget.viewerOptions?.enablePanAndZoom ?? true)) return;
+
+    switch (widget.nodeExpandCameraBehavior) {
+      case NodeExpandCameraBehavior.none:
+        // 카메라 이동 없음
+        break;
+
+      case NodeExpandCameraBehavior.focusClickedNode:
+        // 클릭한 노드로 포커스
+        _focusOnNodeById(node.id);
+        break;
+
+      case NodeExpandCameraBehavior.fitExpandedChildren:
+        // 새로 펼쳐진 자식 노드들만 보이도록 조정
+        if (node.isExpanded && node.children.isNotEmpty) {
+          _fitNodesToView(node.children);
+        } else {
+          _focusOnNodeById(node.id);
+        }
+        break;
+
+      case NodeExpandCameraBehavior.fitExpandedSubtree:
+        // 펼쳐진 전체 서브트리를 보이도록 조정
+        _fitSubtreeToView(node);
+        break;
+    }
+  }
+
+  /// 노드 ID로 카메라 포커스 (기존 CameraFocus 시스템 활용)
+  void _focusOnNodeById(String nodeId) {
+    if (!mounted || !(widget.viewerOptions?.enablePanAndZoom ?? true)) return;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      _performCenterViewOnNode(nodeId);
+    });
+  }
+
+  /// 특정 노드에 대한 중앙 정렬 수행 (기존 로직 재사용)
+  void _performCenterViewOnNode(String nodeId) {
+    final RenderBox? renderBox = context.findRenderObject() as RenderBox?;
+    if (renderBox == null || !renderBox.hasSize) {
+      return;
+    }
+
+    final Size viewportSize = renderBox.size;
+    final double scale = _transformationController.value.getMaxScaleOnAxis();
+
+    // 타겟 노드 찾기
+    final targetNode = _findNodeById(_rootNode, nodeId);
+    if (targetNode == null) return;
+
+    final Offset targetPosition = targetNode.position;
+
+    // 정확한 중앙 정렬 계산 (기존 로직과 동일)
+    final double viewportCenterX = viewportSize.width / 2;
+    final double viewportCenterY = viewportSize.height / 2;
+
+    final double tx = viewportCenterX - (targetPosition.dx * scale);
+    final double ty = viewportCenterY - (targetPosition.dy * scale);
+
+    final newTransform =
+        Matrix4.identity()
+          ..translate(tx, ty)
+          ..scale(scale);
+
+    // 부드러운 애니메이션으로 이동 (기존 focusAnimation 지속시간 사용)
+    _animateToTransform(newTransform);
   }
 
   /// 자식 노드 애니메이션 / Animate children nodes
@@ -1082,6 +1176,92 @@ class _MindMapWidgetState extends State<MindMapWidget>
 
     _activeAnimations.add(animationController);
     animationController.forward();
+  }
+
+  /// 특정 노드들이 모두 보이도록 카메라 조정 / Fit specific nodes to view
+  void _fitNodesToView(List<MindMapNode> nodes) {
+    if (nodes.isEmpty || !mounted) return;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      final RenderBox? renderBox = context.findRenderObject() as RenderBox?;
+      if (renderBox == null || !renderBox.hasSize) {
+        return;
+      }
+
+      final Size viewportSize = renderBox.size;
+      final bounds = _calculateNodesBounds(nodes);
+
+      if (bounds == null) return;
+
+      // 🎯 현재 스케일 유지 (확대/축소 없이 위치만 이동)
+      final double currentScale =
+          _transformationController.value.getMaxScaleOnAxis();
+
+      // 중심점 계산
+      final Offset centerPosition = Offset(
+        bounds.left + bounds.width / 2,
+        bounds.top + bounds.height / 2,
+      );
+
+      final double viewportCenterX = viewportSize.width / 2;
+      final double viewportCenterY = viewportSize.height / 2;
+
+      final double tx = viewportCenterX - (centerPosition.dx * currentScale);
+      final double ty = viewportCenterY - (centerPosition.dy * currentScale);
+
+      final newTransform =
+          Matrix4.identity()
+            ..translate(tx, ty)
+            ..scale(currentScale);
+
+      _animateToTransform(newTransform);
+    });
+  }
+
+  /// 서브트리 전체가 보이도록 카메라 조정 / Fit entire subtree to view
+  void _fitSubtreeToView(MindMapNode rootNode) {
+    if (!mounted) return;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      // 서브트리의 모든 보이는 노드 수집
+      final subtreeNodes = _collectAllVisibleNodes(rootNode);
+      _fitNodesToView(subtreeNodes);
+    });
+  }
+
+  /// 특정 노드들의 경계 계산 / Calculate bounds of specific nodes
+  Rect? _calculateNodesBounds(List<MindMapNode> nodes) {
+    if (nodes.isEmpty) return null;
+
+    double minX = double.infinity;
+    double maxX = double.negativeInfinity;
+    double minY = double.infinity;
+    double maxY = double.negativeInfinity;
+
+    for (final node in nodes) {
+      final size = widget.style.getActualNodeSize(
+        node.title,
+        node.level,
+        customSize: node.size,
+        customTextStyle: node.textStyle,
+      );
+
+      final left = node.position.dx - size.width / 2;
+      final right = node.position.dx + size.width / 2;
+      final top = node.position.dy - size.height / 2;
+      final bottom = node.position.dy + size.height / 2;
+
+      minX = math.min(minX, left);
+      maxX = math.max(maxX, right);
+      minY = math.min(minY, top);
+      maxY = math.max(maxY, bottom);
+    }
+
+    return Rect.fromLTRB(minX, minY, maxX, maxY);
   }
 
   @override
