@@ -5,6 +5,45 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.5] - 2024-12-16
+
+### 🆕 새로운 기능 / New Features
+- **CameraFocus 기능 추가**: 마인드맵의 카메라 포커스를 다양한 방식으로 제어할 수 있는 기능
+  - `CameraFocus.rootNode`: 루트 노드 중심으로 포커스
+  - `CameraFocus.center`: 캔버스 정중앙으로 포커스  
+  - `CameraFocus.fitAll`: 모든 노드가 보이도록 자동 조정 (스마트 스케일링)
+  - `CameraFocus.firstLeaf`: 첫 번째 리프 노드로 포커스
+  - `CameraFocus.custom`: 특정 노드 ID로 포커스 (`focusNodeId`와 함께 사용)
+- **포커스 애니메이션**: `focusAnimation` 속성으로 부드러운 포커스 이동 애니메이션 지원
+- **포커스 여백**: `focusMargin` 속성으로 포커스 시 여백 조정 가능
+- **작은 Container 환경 최적화**: 제한된 공간에서도 마인드맵이 잘 보이도록 개선
+
+### 🛠️ 개선사항 / Improvements  
+- 카메라 포커스 로직을 분리하여 더 유연한 뷰 제어 가능
+- `fitAll` 모드에서 스마트 스케일링으로 모든 노드를 효율적으로 표시
+- 트랜스폼 애니메이션 성능 최적화
+- 작은 Container에서의 UX 대폭 개선
+
+### 📦 새로운 API
+- `cameraFocus`: 카메라 포커스 옵션 설정
+- `focusNodeId`: 포커스할 특정 노드 ID
+- `focusAnimation`: 포커스 애니메이션 지속시간
+- `focusMargin`: 포커스 시 여백 설정
+
+### 🎯 사용 사례
+작은 위젯이나 제한된 공간에서 마인드맵을 사용할 때 특히 유용합니다:
+```dart
+Container(
+  height: 200,
+  child: MindMapWidget(
+    data: data,
+    cameraFocus: CameraFocus.fitAll,
+    focusAnimation: Duration(milliseconds: 500),
+    focusMargin: EdgeInsets.all(10),
+  ),
+)
+```
+
 ## [1.0.4] - 2025-06-19
 
 ### Added

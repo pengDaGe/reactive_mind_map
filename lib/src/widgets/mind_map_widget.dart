@@ -7,6 +7,7 @@ import '../models/mind_map_style.dart';
 import '../models/mind_map_node.dart';
 import '../enums/mind_map_layout.dart';
 import '../enums/node_shape.dart';
+import '../enums/camera_focus.dart';
 import '../painters/mind_map_painter.dart';
 import '../painters/node_painter.dart';
 
@@ -51,6 +52,18 @@ class MindMapWidget extends StatefulWidget {
   /// Initial zoom scale for the mind map (1.0 = no zoom)
   final double initialScale;
 
+  /// 카메라 포커스 옵션 / Camera focus option
+  final CameraFocus cameraFocus;
+
+  /// 포커스할 특정 노드 ID / Specific node ID to focus on
+  final String? focusNodeId;
+
+  /// 포커스 이동 애니메이션 지속시간 / Focus animation duration
+  final Duration focusAnimation;
+
+  /// 포커스할 때의 여백 / Margin when focusing
+  final EdgeInsets focusMargin;
+
   const MindMapWidget({
     super.key,
     required this.data,
@@ -66,6 +79,10 @@ class MindMapWidget extends StatefulWidget {
     this.isNodesCollapsed = false,
     this.initialScale = 1.0,
     this.captureKey,
+    this.cameraFocus = CameraFocus.rootNode,
+    this.focusNodeId,
+    this.focusAnimation = const Duration(milliseconds: 300),
+    this.focusMargin = const EdgeInsets.all(20),
   });
 
   @override
@@ -118,18 +135,29 @@ class _MindMapWidgetState extends State<MindMapWidget>
   @override
   void didUpdateWidget(MindMapWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
+
+    // 데이터나 스타일이 변경된 경우 전체 재계산 / If the data or style is changed, recalculate the entire layout
     if (oldWidget.data != widget.data ||
         oldWidget.style != widget.style ||
         oldWidget.isNodesCollapsed != widget.isNodesCollapsed ||
         oldWidget.initialScale != widget.initialScale) {
       _initializeMindMap();
-      // Re-center after layout updates
+      // 레이아웃 업데이트 후 다시 중앙 정렬 / Re-center after layout updates
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
           _calculateCanvasAndLayout();
           if ((widget.viewerOptions?.enablePanAndZoom ?? true)) {
             _centerView();
           }
+        }
+      });
+    }
+    // 카메라 포커스만 변경된 경우 바로 포커스 이동 / If only the camera focus is changed, move the focus immediately
+    else if (oldWidget.cameraFocus != widget.cameraFocus ||
+        oldWidget.focusNodeId != widget.focusNodeId) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && (widget.viewerOptions?.enablePanAndZoom ?? true)) {
+          _centerView();
         }
       });
     }
@@ -871,17 +899,189 @@ class _MindMapWidgetState extends State<MindMapWidget>
     return null;
   }
 
-  /// Centers the InteractiveViewer so the root node appears in the viewport center at the given scale.
+  /// 카메라 포커스에 따라 InteractiveViewer 중앙 정렬 / Centers the InteractiveViewer based on the camera focus option.
   void _centerView() {
-    final Size screenSize = MediaQuery.of(context).size;
-    final double scale = widget.initialScale;
-    // compute translation so that rootPosition maps to screen center at the given scale
-    final double tx = screenSize.width / 2 - (_rootPosition.dx * scale);
-    final double ty = screenSize.height / 2 - (_rootPosition.dy * scale);
-    _transformationController.value =
+    // 다음 프레임에서 정확한 크기를 얻어 계산 / Get the exact size in the next frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      _performCenterView();
+    });
+  }
+
+  /// 실제 중앙 정렬 수행 / Perform actual center alignment
+  void _performCenterView() {
+    // RenderBox에서 정확한 크기 획득 / Get the exact size from RenderBox
+    final RenderBox? renderBox = context.findRenderObject() as RenderBox?;
+    if (renderBox == null || !renderBox.hasSize) {
+      return;
+    }
+
+    final Size viewportSize = renderBox.size;
+
+    double scale = widget.initialScale;
+    Offset targetPosition = _rootPosition;
+
+    switch (widget.cameraFocus) {
+      case CameraFocus.rootNode:
+        targetPosition = _rootPosition;
+        break;
+
+      case CameraFocus.center:
+        targetPosition = Offset(
+          _actualCanvasSize.width / 2,
+          _actualCanvasSize.height / 2,
+        );
+        break;
+
+      case CameraFocus.fitAll:
+        final bounds = _calculateAllNodesBounds();
+        if (bounds != null) {
+          final double scaleX =
+              (viewportSize.width - widget.focusMargin.horizontal) /
+              bounds.width;
+          final double scaleY =
+              (viewportSize.height - widget.focusMargin.vertical) /
+              bounds.height;
+          scale = math.min(scaleX, math.min(scaleY, widget.initialScale));
+          scale = math.max(scale, widget.viewerOptions?.minScale ?? 0.1);
+
+          targetPosition = Offset(
+            bounds.left + bounds.width / 2,
+            bounds.top + bounds.height / 2,
+          );
+        }
+        break;
+
+      case CameraFocus.firstLeaf:
+        final firstLeaf = _findFirstLeafNode(_rootNode);
+        if (firstLeaf != null) {
+          targetPosition = firstLeaf.position;
+        }
+        break;
+
+      case CameraFocus.custom:
+        if (widget.focusNodeId != null) {
+          final targetNode = _findNodeById(_rootNode, widget.focusNodeId!);
+          if (targetNode != null) {
+            targetPosition = targetNode.position;
+          }
+        }
+        break;
+    }
+
+    // 정확한 중앙 정렬 계산
+    // 목표: targetPosition이 화면 중앙에 오도록 변환
+    final double viewportCenterX = viewportSize.width / 2;
+    final double viewportCenterY = viewportSize.height / 2;
+
+    // 변환 공식: 화면중심 = (캔버스좌표 * 스케일) + 이동값
+    // 따라서: 이동값 = 화면중심 - (캔버스좌표 * 스케일)
+    final double tx = viewportCenterX - (targetPosition.dx * scale);
+    final double ty = viewportCenterY - (targetPosition.dy * scale);
+
+    final newTransform =
         Matrix4.identity()
           ..translate(tx, ty)
           ..scale(scale);
+
+    // 애니메이션 또는 즉시 적용
+    if (widget.focusAnimation.inMilliseconds > 0) {
+      _animateToTransform(newTransform);
+    } else {
+      _transformationController.value = newTransform;
+    }
+  }
+
+  /// 모든 노드의 경계 계산 / Calculate bounds of all nodes
+  Rect? _calculateAllNodesBounds() {
+    final allNodes = <MindMapNode>[];
+    final allVisibleNodes = _collectAllVisibleNodes(_rootNode);
+    allNodes.addAll(allVisibleNodes);
+
+    if (allNodes.isEmpty) return null;
+
+    double minX = double.infinity;
+    double maxX = double.negativeInfinity;
+    double minY = double.infinity;
+    double maxY = double.negativeInfinity;
+
+    for (final node in allNodes) {
+      final size = widget.style.getActualNodeSize(
+        node.title,
+        node.level,
+        customSize: node.size,
+        customTextStyle: node.textStyle,
+      );
+
+      final left = node.position.dx - size.width / 2;
+      final right = node.position.dx + size.width / 2;
+      final top = node.position.dy - size.height / 2;
+      final bottom = node.position.dy + size.height / 2;
+
+      minX = math.min(minX, left);
+      maxX = math.max(maxX, right);
+      minY = math.min(minY, top);
+      maxY = math.max(maxY, bottom);
+    }
+
+    return Rect.fromLTRB(minX, minY, maxX, maxY);
+  }
+
+  /// 첫 번째 리프 노드 찾기 / Find first leaf node
+  MindMapNode? _findFirstLeafNode(MindMapNode node) {
+    if (!node.hasChildren || !node.isExpanded) {
+      return node;
+    }
+
+    for (final child in node.children) {
+      final leaf = _findFirstLeafNode(child);
+      if (leaf != null) return leaf;
+    }
+
+    return null;
+  }
+
+  /// ID로 노드 찾기 / Find node by ID
+  MindMapNode? _findNodeById(MindMapNode node, String id) {
+    if (node.id == id) return node;
+
+    for (final child in node.children) {
+      final found = _findNodeById(child, id);
+      if (found != null) return found;
+    }
+
+    return null;
+  }
+
+  /// 트랜스폼을 애니메이션으로 적용 / Apply transform with animation
+  void _animateToTransform(Matrix4 targetTransform) {
+    final AnimationController animationController = AnimationController(
+      duration: widget.focusAnimation,
+      vsync: this,
+    );
+
+    final Animation<Matrix4> transformAnimation = Tween<Matrix4>(
+      begin: _transformationController.value,
+      end: targetTransform,
+    ).animate(
+      CurvedAnimation(parent: animationController, curve: Curves.easeInOut),
+    );
+
+    animationController.addListener(() {
+      _transformationController.value = transformAnimation.value;
+    });
+
+    animationController.addStatusListener((status) {
+      if (status == AnimationStatus.completed ||
+          status == AnimationStatus.dismissed) {
+        animationController.dispose();
+        _activeAnimations.remove(animationController);
+      }
+    });
+
+    _activeAnimations.add(animationController);
+    animationController.forward();
   }
 
   @override

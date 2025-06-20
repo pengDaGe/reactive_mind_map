@@ -46,6 +46,24 @@ Flutter용 다중 레이아웃, 동적 크기 조절, 다양한 스타일링 옵
 - 확대/축소, 팬 기능 / Pan & zoom functionality
 - 노드 확장/축소 상태 추적 / Node expand/collapse state tracking
 
+🎯 **스마트 카메라 포커스 / Smart Camera Focus** 🆕
+- 자동 전체보기로 작은 위젯에서도 최적 표시 / Auto-fit for optimal display in small widgets
+- 특정 노드 강조 및 가이드 투어 지원 / Specific node highlighting and guided tours
+- 부드러운 포커스 이동 애니메이션 / Smooth focus transition animations
+- 5가지 포커스 모드 (루트, 중앙, 전체, 리프, 커스텀) / 5 focus modes (root, center, fitAll, leaf, custom)
+
+### Event Handling / 이벤트 처리
+
+```dart
+MindMapWidget(
+  data: myData,
+  onNodeTap: (node) => print('Node tapped: ${node.title}'),
+  onNodeLongPress: (node) => _showNodeOptions(node),
+  onNodeExpandChanged: (node, isExpanded) => 
+    print('${node.title} ${isExpanded ? 'expanded' : 'collapsed'}'),
+);
+```
+
 ## Installation / 설치
 
 Add this to your package's `pubspec.yaml` file:
@@ -88,6 +106,8 @@ class MyMindMap extends StatelessWidget {
           layout: MindMapLayout.right,
           nodeShape: NodeShape.roundedRectangle,
         ),
+        cameraFocus: CameraFocus.fitAll,
+        focusAnimation: Duration(milliseconds: 500),
         onNodeTap: (node) => print('Tapped: ${node.title}'),
       ),
     );
@@ -140,6 +160,112 @@ Widget build(BuildContext context) {
 ```
 
 ## Advanced Usage / 고급 사용법
+
+### Camera Focus Control / 카메라 포커스 제어
+
+```dart
+MindMapWidget(
+  data: myData,
+  cameraFocus: CameraFocus.fitAll,
+  focusNodeId: 'specific_node_id',
+  focusAnimation: Duration(milliseconds: 500),
+  focusMargin: EdgeInsets.all(20),
+)
+```
+
+#### Camera Focus Options / 카메라 포커스 옵션
+
+| Focus Type / 포커스 타입 | When to Use / 사용 시기 |
+|-------------------------|------------------------|
+| `CameraFocus.rootNode` | Default view / 기본 뷰 |
+| `CameraFocus.center` | Centered layouts / 중앙 정렬 레이아웃 |
+| `CameraFocus.fitAll` | **Small widgets, overview** / **작은 위젯, 전체보기** |
+| `CameraFocus.firstLeaf` | End-point focus / 끝점 포커스 |
+| `CameraFocus.custom` | **Specific node targeting** / **특정 노드 타겟팅** |
+
+#### Practical Examples / 실제 사용 예시
+
+**1. Small Container Optimization / 작은 컨테이너 최적화**
+```dart
+Container(
+  height: 200,
+  child: MindMapWidget(
+    data: myData,
+    cameraFocus: CameraFocus.fitAll,
+    focusMargin: EdgeInsets.all(10),
+    focusAnimation: Duration(milliseconds: 300),
+  ),
+)
+```
+
+**2. Specific Node Highlighting / 특정 노드 강조**
+```dart
+MindMapWidget(
+  data: myData,
+  cameraFocus: CameraFocus.custom,
+  focusNodeId: 'important_milestone',
+  focusAnimation: Duration(milliseconds: 800),
+  initialScale: 1.2,
+)
+```
+
+**3. Guided Mind Map Tour / 가이드 마인드맵 투어**
+```dart
+class GuidedMindMapTour extends StatefulWidget {
+  @override
+  State<GuidedMindMapTour> createState() => _GuidedMindMapTourState();
+}
+
+class _GuidedMindMapTourState extends State<GuidedMindMapTour> {
+  int currentStep = 0;
+  final List<String> tourSteps = ['intro', 'planning', 'development', 'testing'];
+
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            ElevatedButton(
+              onPressed: currentStep > 0 ? _previousStep : null,
+              child: Text('이전'),
+            ),
+            Text('${currentStep + 1} / ${tourSteps.length}'),
+            ElevatedButton(
+              onPressed: currentStep < tourSteps.length - 1 ? _nextStep : null,
+              child: Text('다음'),
+            ),
+          ],
+        ),
+        Expanded(
+          child: MindMapWidget(
+            data: myData,
+            cameraFocus: CameraFocus.custom,
+            focusNodeId: tourSteps[currentStep],
+            focusAnimation: Duration(milliseconds: 600),
+            focusMargin: EdgeInsets.all(50),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _nextStep() => setState(() => currentStep++);
+  void _previousStep() => setState(() => currentStep--);
+}
+```
+
+**4. Dynamic Focus Based on Data / 데이터에 따른 동적 포커스**
+```dart
+Widget buildMindMap(MindMapData data) {
+  final nodeCount = _countAllNodes(data);
+  
+  return MindMapWidget(
+    data: data,
+    cameraFocus: nodeCount > 10 ? CameraFocus.fitAll : CameraFocus.rootNode,
+    focusAnimation: Duration(milliseconds: 400),
+  );
+}
+```
 
 ### Custom Styling / 커스텀 스타일링
 
