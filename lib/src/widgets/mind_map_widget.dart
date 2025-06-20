@@ -206,7 +206,9 @@ class _MindMapWidgetState extends State<MindMapWidget>
     try {
       _actualCanvasSize = widget.canvasSize ?? widget.minCanvasSize;
 
-      _calculateRootPosition();
+      if (!_isTogglingNode) {
+        _calculateRootPosition();
+      }
       _calculateSubtreeHeights(_rootNode);
       _calculateSubtreeWidths(_rootNode);
       _assignPositions(_rootNode, 0);
@@ -217,7 +219,10 @@ class _MindMapWidgetState extends State<MindMapWidget>
         if (_actualCanvasSize != requiredSize) {
           _actualCanvasSize = requiredSize;
           _resetNodePositions(_rootNode);
-          _calculateRootPosition();
+
+          if (!_isTogglingNode) {
+            _calculateRootPosition();
+          }
           _calculateSubtreeHeights(_rootNode);
           _calculateSubtreeWidths(_rootNode);
           _assignPositions(_rootNode, 0);

@@ -5,7 +5,50 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.5] - 2024-12-16
+## [1.1.0] - 2025-06-20
+
+### 🎯 New Features
+- **NodeExpandCameraBehavior**: 노드 확장 시 카메라 동작을 제어할 수 있는 새로운 기능 추가
+  - `none`: 카메라 이동 없음 (기본값)
+  - `focusClickedNode`: 클릭한 노드로 포커스 이동
+  - `fitExpandedChildren`: 새로 펼쳐진 자식 노드들이 모두 보이도록 조정
+  - `fitExpandedSubtree`: 펼쳐진 전체 서브트리가 보이도록 조정
+
+### 🐛 Bug Fixes
+- **노드 토글 시 카메라 이동 문제 해결**: 노드를 접거나 펼칠 때 전체 마인드맵이 조금씩 이동하는 버그 수정
+- **루트 노드 위치 안정성 개선**: 노드 토글 중에는 루트 노드 위치를 고정하여 안정적인 사용자 경험 제공
+
+### 🔧 Technical Improvements
+- 카메라 제어 로직 최적화
+- 노드 토글 상태 관리 개선
+
+## [1.0.5] - 2024-01-XX
+
+### 🎯 New Features
+- **Smart Camera Focus**: 스마트 카메라 포커스 시스템 추가
+  - `CameraFocus.rootNode`: 루트 노드에 포커스 (기본값)
+  - `CameraFocus.center`: 캔버스 중앙에 포커스
+  - `CameraFocus.fitAll`: 모든 노드가 보이도록 자동 조정
+  - `CameraFocus.firstLeaf`: 첫 번째 리프 노드에 포커스
+  - `CameraFocus.custom`: 특정 노드 ID로 포커스 (`focusNodeId` 사용)
+
+### 🔧 Camera Control Options
+- `cameraFocus`: 카메라 포커스 옵션 설정
+- `focusNodeId`: 포커스할 특정 노드 ID 지정
+- `focusAnimation`: 포커스 이동 애니메이션 지속시간 (기본: 300ms)
+- `focusMargin`: 포커스 시 여백 설정 (기본: 20px)
+
+### 🎨 Enhanced User Experience
+- 작은 컨테이너에서도 완벽한 마인드맵 표시
+- 부드러운 카메라 이동 애니메이션
+- 정확한 중앙 정렬 계산으로 픽셀 퍼펙트 포커스
+
+### 📖 Documentation
+- README에 Camera Focus Control 사용법 추가
+- 4가지 실제 사용 예시 제공
+- 포커스 옵션 테이블 추가
+
+## [1.0.4] - 2025-06-20
 
 ### 🆕 새로운 기능 / New Features
 - **CameraFocus 기능 추가**: 마인드맵의 카메라 포커스를 다양한 방식으로 제어할 수 있는 기능
@@ -43,45 +86,6 @@ Container(
   ),
 )
 ```
-
-## [1.0.4] - 2025-06-19
-
-### Added
-- 🎯 **자동 중앙 정렬 기능**: 초기 로드 시 루트 노드가 자동으로 화면 중앙에 위치 / **Auto-centering**: Root node automatically centers on initial load
-- 📏 **초기 줌 스케일 설정**: `initialScale` 속성으로 기본 확대/축소 레벨 조정 가능 / **Initial zoom scale**: `initialScale` property for default zoom level control
-- 📂 **노드 기본 확장 상태**: `isNodesCollapsed` 속성으로 노드 초기 상태 제어 / **Default node expansion**: `isNodesCollapsed` property for initial node state control
-- 📸 **이미지 캡처 기능**: `captureKey` 속성으로 마인드맵을 이미지로 저장 가능 / **Image capture**: `captureKey` property for saving mind map as image
-- 🔄 **TransformationController 지원**: 뷰포트 위치 및 줌 레벨 프로그래밍 제어 / **TransformationController support**: Programmatic viewport and zoom control
-
-### Improved
-- 🔧 **텍스트 렌더링 품질**: `softWrap: true` 적용으로 텍스트 오버플로우 방지 / **Text rendering quality**: `softWrap: true` prevents text overflow
-- ⚡ **초기 로딩 성능**: 자동 중앙 정렬로 사용자 경험 개선 / **Initial loading performance**: Auto-centering improves user experience
-- 🎨 **InteractiveViewer 최적화**: 더 부드러운 팬/줌 인터랙션 / **InteractiveViewer optimization**: Smoother pan/zoom interactions
-- 📱 **반응형 개선**: 다양한 화면 크기에서 더 나은 적응성 / **Responsive improvements**: Better adaptation to various screen sizes
-
-### Fixed
-- ❌ **초기 뷰포트 문제**: 루트 노드가 화면 밖에 위치하는 문제 해결 / **Initial viewport issue**: Fixed root node appearing outside viewport
-- 🔤 **텍스트 잘림 문제**: 긴 텍스트의 표시 오류 해결 / **Text clipping issue**: Fixed display errors with long text
-- 🎯 **노드 포커스 문제**: 사용자가 마인드맵을 찾기 어려운 문제 해결 / **Node focus issue**: Fixed difficulty finding mind map content
-
-### Breaking Changes
-- None - 이 업데이트는 모든 기존 API와 호환됩니다 / This update is fully compatible with existing APIs
-
-### Usage Examples
-```dart
-MindMapWidget(
-  data: yourMindMapData,
-  initialScale: 0.8,           // 초기 80% 줌 레벨
-  isNodesCollapsed: false,     // 모든 노드 기본 확장
-  captureKey: GlobalKey(),     // 이미지 캡처용 키
-  style: MindMapStyle(
-    // ... 기존 스타일 설정
-  ),
-)
-```
-
-### Contributors
-- Special thanks to @TOZXII for the major contributions including auto-centering, initial scale, and image capture features
 
 ## [1.0.3] - 2025-06-06
 

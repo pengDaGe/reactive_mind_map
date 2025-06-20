@@ -267,6 +267,56 @@ Widget buildMindMap(MindMapData data) {
 }
 ```
 
+### Node Expand Camera Behavior / 노드 확장 카메라 동작 🆕
+
+Control how the camera behaves when users expand or collapse nodes:
+사용자가 노드를 펼치거나 접을 때 카메라가 어떻게 동작할지 제어할 수 있습니다:
+
+```dart
+MindMapWidget(
+  data: myData,
+  nodeExpandCameraBehavior: NodeExpandCameraBehavior.focusClickedNode,
+)
+```
+
+#### Node Expand Camera Options / 노드 확장 카메라 옵션
+
+| Behavior / 동작 | Description / 설명 |
+|-----------------|-------------------|
+| `NodeExpandCameraBehavior.none` | **No camera movement (default)** / **카메라 이동 없음 (기본값)** |
+| `NodeExpandCameraBehavior.focusClickedNode` | Focus on the clicked node / 클릭한 노드로 포커스 |
+| `NodeExpandCameraBehavior.fitExpandedChildren` | Fit newly expanded children to view / 새로 펼쳐진 자식 노드들이 보이도록 조정 |
+| `NodeExpandCameraBehavior.fitExpandedSubtree` | Fit entire expanded subtree to view / 펼쳐진 전체 서브트리가 보이도록 조정 |
+
+#### Practical Examples / 실제 사용 예시
+
+**1. Focus on Clicked Node / 클릭한 노드에 포커스**
+```dart
+MindMapWidget(
+  data: myData,
+  nodeExpandCameraBehavior: NodeExpandCameraBehavior.focusClickedNode,
+  focusAnimation: Duration(milliseconds: 400),
+)
+```
+
+**2. Show All Expanded Children / 펼쳐진 모든 자식 노드 표시**
+```dart
+MindMapWidget(
+  data: myData,
+  nodeExpandCameraBehavior: NodeExpandCameraBehavior.fitExpandedChildren,
+  focusAnimation: Duration(milliseconds: 500),
+)
+```
+
+**3. Show Entire Subtree / 전체 서브트리 표시**
+```dart
+MindMapWidget(
+  data: myData,
+  nodeExpandCameraBehavior: NodeExpandCameraBehavior.fitExpandedSubtree,
+  focusMargin: EdgeInsets.all(30),
+)
+```
+
 ### Custom Styling / 커스텀 스타일링
 
 ```dart
