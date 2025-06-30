@@ -144,7 +144,7 @@ void main() {
       expect(style.nodeShape, equals(NodeShape.roundedRectangle));
       expect(style.backgroundColor, equals(const Color(0xFFF8FAFC)));
       expect(style.levelSpacing, equals(240.0));
-      expect(style.nodeMargin, equals(20.0));
+      expect(style.nodeMargin, equals(40.0));
     });
 
     test('MindMapStyle copyWith 테스트', () {

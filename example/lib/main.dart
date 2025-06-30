@@ -212,7 +212,6 @@ class _TestScreenState extends State<TestScreen> {
       lastAction =
           '${_getFocusName()} ${nodeId != null ? '→ $nodeId' : ''}로 이동';
     });
-    print('포커스 변경: $focus ${nodeId != null ? '→ $nodeId' : ''}');
   }
 
   String _getFocusName() {

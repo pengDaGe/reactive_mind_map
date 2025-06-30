@@ -291,6 +291,17 @@ class _MindMapWidgetState extends State<MindMapWidget>
       maxY = math.max(maxY, nodeBottom);
     }
 
+    final collapsedNodes = _collectAllCollapsedNodes(_rootNode);
+    if (collapsedNodes.isNotEmpty) {
+      final estimatedBounds = _estimateCollapsedNodesBounds(collapsedNodes);
+      if (estimatedBounds != null) {
+        minX = math.min(minX, estimatedBounds.left);
+        maxX = math.max(maxX, estimatedBounds.right);
+        minY = math.min(minY, estimatedBounds.top);
+        maxY = math.max(maxY, estimatedBounds.bottom);
+      }
+    }
+
     final extraPaddingX = math.max(maxNodeWidth, 100.0);
     final extraPaddingY = math.max(maxNodeHeight, 100.0);
 
@@ -329,6 +340,116 @@ class _MindMapWidgetState extends State<MindMapWidget>
     }
 
     return nodes;
+  }
+
+  /// 축소된 노드들 수집 / Collect all collapsed nodes
+  List<MindMapNode> _collectAllCollapsedNodes(
+    MindMapNode node, {
+    Set<String>? visited,
+  }) {
+    visited ??= <String>{};
+    if (visited.contains(node.id)) return [];
+    visited.add(node.id);
+
+    List<MindMapNode> collapsedNodes = [];
+
+    if (!node.isExpanded && node.children.isNotEmpty) {
+      collapsedNodes.add(node);
+      // 축소된 노드의 모든 하위 노드들도 포함
+      for (var child in node.children) {
+        collapsedNodes.addAll(
+          _collectAllNodes(child, visited: Set.from(visited)),
+        );
+      }
+    } else if (node.isExpanded) {
+      // 확장된 노드의 경우 자식들을 재귀적으로 확인
+      for (var child in node.children) {
+        collapsedNodes.addAll(
+          _collectAllCollapsedNodes(child, visited: Set.from(visited)),
+        );
+      }
+    }
+
+    return collapsedNodes;
+  }
+
+  /// 모든 노드 수집 (확장 상태 무관) / Collect all nodes regardless of expansion state
+  List<MindMapNode> _collectAllNodes(MindMapNode node, {Set<String>? visited}) {
+    visited ??= <String>{};
+    if (visited.contains(node.id)) return [];
+    visited.add(node.id);
+
+    List<MindMapNode> nodes = [node];
+
+    for (var child in node.children) {
+      nodes.addAll(_collectAllNodes(child, visited: Set.from(visited)));
+    }
+
+    return nodes;
+  }
+
+  /// 축소된 노드들의 예상 경계 계산 / Estimate bounds for collapsed nodes
+  Rect? _estimateCollapsedNodesBounds(List<MindMapNode> collapsedNodes) {
+    if (collapsedNodes.isEmpty) return null;
+
+    double minX = double.infinity;
+    double maxX = double.negativeInfinity;
+    double minY = double.infinity;
+    double maxY = double.negativeInfinity;
+
+    for (var node in collapsedNodes) {
+      final nodeSize = widget.style.getActualNodeSize(
+        node.title,
+        node.level,
+        customSize: node.size,
+        customTextStyle: node.textStyle,
+      );
+
+      // 축소된 노드의 현재 위치를 기준으로 예상 확장 영역 계산
+      // 레이아웃에 따라 확장 방향 예측
+      double expandedWidth = nodeSize.width;
+      double expandedHeight = nodeSize.height;
+
+      // 자식 노드 수를 고려한 예상 확장 크기
+      if (node.children.isNotEmpty) {
+        final childCount = node.children.length;
+        final estimatedSpacing = widget.style.levelSpacing;
+
+        switch (widget.style.layout) {
+          case MindMapLayout.right:
+          case MindMapLayout.left:
+          case MindMapLayout.horizontal:
+            expandedWidth += estimatedSpacing;
+            expandedHeight +=
+                childCount * (nodeSize.height + widget.style.nodeMargin);
+            break;
+          case MindMapLayout.top:
+          case MindMapLayout.bottom:
+          case MindMapLayout.vertical:
+            expandedWidth +=
+                childCount * (nodeSize.width + widget.style.nodeMargin);
+            expandedHeight += estimatedSpacing;
+            break;
+          case MindMapLayout.radial:
+            final radius = estimatedSpacing * 0.8;
+            expandedWidth += radius * 2;
+            expandedHeight += radius * 2;
+            break;
+        }
+      }
+
+      final nodeLeft = node.position.dx - expandedWidth / 2;
+      final nodeRight = node.position.dx + expandedWidth / 2;
+      final nodeTop = node.position.dy - expandedHeight / 2;
+      final nodeBottom = node.position.dy + expandedHeight / 2;
+
+      minX = math.min(minX, nodeLeft);
+      maxX = math.max(maxX, nodeRight);
+      minY = math.min(minY, nodeTop);
+      maxY = math.max(maxY, nodeBottom);
+    }
+
+    return Rect.fromLTRB(minX, minY, maxX, maxY);
   }
 
   /// 루트 노드 위치 계산 / Calculate root node position
@@ -423,11 +544,15 @@ class _MindMapWidgetState extends State<MindMapWidget>
       customTextStyle: node.textStyle,
     );
 
-    final additionalMargin = nodeSize.height * 0.3;
+    final additionalMargin = nodeSize.height * 0.5;
+    final minSpacing = widget.style.nodeMargin * 2;
+
+    final childCountFactor = math.max(1.0, node.children.length * 0.2);
+    final expandedMargin = additionalMargin * childCountFactor;
 
     node.subtreeHeight = math.max(
-      totalChildHeight,
-      nodeSize.height + widget.style.nodeMargin + additionalMargin,
+      totalChildHeight + minSpacing,
+      nodeSize.height + widget.style.nodeMargin + expandedMargin,
     );
 
     return node.subtreeHeight;
@@ -474,11 +599,15 @@ class _MindMapWidgetState extends State<MindMapWidget>
       customTextStyle: node.textStyle,
     );
 
-    final additionalMargin = nodeSize.width * 0.3;
+    final additionalMargin = nodeSize.width * 0.5;
+    final minSpacing = widget.style.nodeMargin * 2;
+
+    final childCountFactor = math.max(1.0, node.children.length * 0.2);
+    final expandedMargin = additionalMargin * childCountFactor;
 
     node.subtreeWidth = math.max(
-      totalChildWidth,
-      nodeSize.width + widget.style.nodeMargin + additionalMargin,
+      totalChildWidth + minSpacing,
+      nodeSize.width + widget.style.nodeMargin + expandedMargin,
     );
 
     return node.subtreeWidth;
@@ -569,9 +698,15 @@ class _MindMapWidgetState extends State<MindMapWidget>
 
     final baseSpacing = widget.style.levelSpacing;
     final parentMaxSize = math.max(parentSize.width, parentSize.height);
-    final additionalSpacing = (parentMaxSize + maxChildSize) / 2 + 40;
 
-    return math.max(baseSpacing, additionalSpacing + 80);
+    final nodeBasedSpacing = (parentMaxSize + maxChildSize) / 2 + 60;
+    final childCountFactor = math.max(1.0, parent.children.length * 0.15);
+    final levelFactor = math.max(1.0, level * 0.1);
+
+    final dynamicSpacing = nodeBasedSpacing * childCountFactor * levelFactor;
+    final minSpacing = baseSpacing + 120;
+
+    return math.max(minSpacing, dynamicSpacing);
   }
 
   /// 오른쪽 방향 레이아웃 / Right direction layout
@@ -582,6 +717,11 @@ class _MindMapWidgetState extends State<MindMapWidget>
       0.0,
       (sum, child) => sum + child.subtreeHeight,
     );
+
+    // 자식 노드들 사이의 추가 간격 적용
+    final childGap = _calculateChildGap(parent.children);
+    totalHeight += childGap * (parent.children.length - 1);
+
     double currentY = parent.targetPosition.dy - totalHeight / 2;
 
     for (var child in parent.children) {
@@ -592,7 +732,7 @@ class _MindMapWidgetState extends State<MindMapWidget>
         child.hasFixedPosition = true;
         child.parentDirection = 'right';
       }
-      currentY += child.subtreeHeight;
+      currentY += child.subtreeHeight + childGap;
     }
   }
 
@@ -604,6 +744,11 @@ class _MindMapWidgetState extends State<MindMapWidget>
       0.0,
       (sum, child) => sum + child.subtreeHeight,
     );
+
+    // 자식 노드들 사이의 추가 간격 적용
+    final childGap = _calculateChildGap(parent.children);
+    totalHeight += childGap * (parent.children.length - 1);
+
     double currentY = parent.targetPosition.dy - totalHeight / 2;
 
     for (var child in parent.children) {
@@ -614,7 +759,7 @@ class _MindMapWidgetState extends State<MindMapWidget>
         child.hasFixedPosition = true;
         child.parentDirection = 'left';
       }
-      currentY += child.subtreeHeight;
+      currentY += child.subtreeHeight + childGap;
     }
   }
 
@@ -626,6 +771,11 @@ class _MindMapWidgetState extends State<MindMapWidget>
       0.0,
       (sum, child) => sum + child.subtreeWidth,
     );
+
+    // 자식 노드들 사이의 추가 간격 적용
+    final childGap = _calculateChildGap(parent.children);
+    totalWidth += childGap * (parent.children.length - 1);
+
     double currentX = parent.targetPosition.dx - totalWidth / 2;
 
     for (var child in parent.children) {
@@ -636,7 +786,7 @@ class _MindMapWidgetState extends State<MindMapWidget>
         child.hasFixedPosition = true;
         child.parentDirection = 'top';
       }
-      currentX += child.subtreeWidth;
+      currentX += child.subtreeWidth + childGap;
     }
   }
 
@@ -648,6 +798,11 @@ class _MindMapWidgetState extends State<MindMapWidget>
       0.0,
       (sum, child) => sum + child.subtreeWidth,
     );
+
+    // 자식 노드들 사이의 추가 간격 적용
+    final childGap = _calculateChildGap(parent.children);
+    totalWidth += childGap * (parent.children.length - 1);
+
     double currentX = parent.targetPosition.dx - totalWidth / 2;
 
     for (var child in parent.children) {
@@ -658,7 +813,7 @@ class _MindMapWidgetState extends State<MindMapWidget>
         child.hasFixedPosition = true;
         child.parentDirection = 'bottom';
       }
-      currentX += child.subtreeWidth;
+      currentX += child.subtreeWidth + childGap;
     }
   }
 
@@ -744,6 +899,11 @@ class _MindMapWidgetState extends State<MindMapWidget>
       0.0,
       (sum, child) => sum + child.subtreeHeight,
     );
+
+    // 자식 노드들 사이의 추가 간격 적용
+    final childGap = _calculateChildGap(children);
+    totalHeight += childGap * (children.length - 1);
+
     double currentY = parent.targetPosition.dy - totalHeight / 2;
 
     for (var child in children) {
@@ -753,7 +913,7 @@ class _MindMapWidgetState extends State<MindMapWidget>
         child.position = child.targetPosition;
         child.hasFixedPosition = true;
       }
-      currentY += child.subtreeHeight;
+      currentY += child.subtreeHeight + childGap;
     }
   }
 
@@ -770,6 +930,11 @@ class _MindMapWidgetState extends State<MindMapWidget>
       0.0,
       (sum, child) => sum + child.subtreeWidth,
     );
+
+    // 자식 노드들 사이의 추가 간격 적용
+    final childGap = _calculateChildGap(children);
+    totalWidth += childGap * (children.length - 1);
+
     double currentX = parent.targetPosition.dx - totalWidth / 2;
 
     for (var child in children) {
@@ -779,8 +944,36 @@ class _MindMapWidgetState extends State<MindMapWidget>
         child.position = child.targetPosition;
         child.hasFixedPosition = true;
       }
-      currentX += child.subtreeWidth;
+      currentX += child.subtreeWidth + childGap;
     }
+  }
+
+  /// 자식 노드들 사이의 간격 계산 / Calculate gap between child nodes
+  double _calculateChildGap(List<MindMapNode> children) {
+    if (children.isEmpty) return 0.0;
+
+    // 자식 노드들의 평균 크기 계산
+    double avgNodeSize = 0.0;
+    for (var child in children) {
+      final childSize = widget.style.getActualNodeSize(
+        child.title,
+        child.level,
+        customSize: child.size,
+        customTextStyle: child.textStyle,
+      );
+      avgNodeSize += math.max(childSize.width, childSize.height);
+    }
+    avgNodeSize /= children.length;
+
+    // 기본 간격 + 노드 크기 기반 간격
+    final baseGap = widget.style.nodeMargin;
+    final sizeBasedGap = avgNodeSize * 0.3;
+    final childCountFactor = math.min(
+      2.0,
+      children.length * 0.1,
+    ); // 자식이 많을수록 간격 증가 (최대 2배)
+
+    return (baseGap + sizeBasedGap) * childCountFactor;
   }
 
   /// 노드 토글 / Toggle node
