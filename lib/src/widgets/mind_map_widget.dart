@@ -322,9 +322,9 @@ class _MindMapWidgetState extends State<MindMapWidget>
 
   /// 모든 보이는 노드 수집 / Collect all visible nodes
   List<MindMapNode> _collectAllVisibleNodes(
-    MindMapNode node, {
-    Set<String>? visited,
-  }) {
+      MindMapNode node, {
+        Set<String>? visited,
+      }) {
     visited ??= <String>{};
     if (visited.contains(node.id)) return [];
     visited.add(node.id);
@@ -344,9 +344,9 @@ class _MindMapWidgetState extends State<MindMapWidget>
 
   /// 축소된 노드들 수집 / Collect all collapsed nodes
   List<MindMapNode> _collectAllCollapsedNodes(
-    MindMapNode node, {
-    Set<String>? visited,
-  }) {
+      MindMapNode node, {
+        Set<String>? visited,
+      }) {
     visited ??= <String>{};
     if (visited.contains(node.id)) return [];
     visited.add(node.id);
@@ -715,7 +715,7 @@ class _MindMapWidgetState extends State<MindMapWidget>
     final x = parent.targetPosition.dx + dynamicSpacing;
     double totalHeight = parent.children.fold(
       0.0,
-      (sum, child) => sum + child.subtreeHeight,
+          (sum, child) => sum + child.subtreeHeight,
     );
 
     // 자식 노드들 사이의 추가 간격 적용
@@ -742,7 +742,7 @@ class _MindMapWidgetState extends State<MindMapWidget>
     final x = parent.targetPosition.dx - dynamicSpacing;
     double totalHeight = parent.children.fold(
       0.0,
-      (sum, child) => sum + child.subtreeHeight,
+          (sum, child) => sum + child.subtreeHeight,
     );
 
     // 자식 노드들 사이의 추가 간격 적용
@@ -769,7 +769,7 @@ class _MindMapWidgetState extends State<MindMapWidget>
     final y = parent.targetPosition.dy - dynamicSpacing;
     double totalWidth = parent.children.fold(
       0.0,
-      (sum, child) => sum + child.subtreeWidth,
+          (sum, child) => sum + child.subtreeWidth,
     );
 
     // 자식 노드들 사이의 추가 간격 적용
@@ -796,7 +796,7 @@ class _MindMapWidgetState extends State<MindMapWidget>
     final y = parent.targetPosition.dy + dynamicSpacing;
     double totalWidth = parent.children.fold(
       0.0,
-      (sum, child) => sum + child.subtreeWidth,
+          (sum, child) => sum + child.subtreeWidth,
     );
 
     // 자식 노드들 사이의 추가 간격 적용
@@ -840,7 +840,7 @@ class _MindMapWidgetState extends State<MindMapWidget>
   void _assignHorizontalLayout(MindMapNode parent, int level) {
     if (level == 0) {
       final leftChildren =
-          parent.children.take((parent.children.length / 2).ceil()).toList();
+      parent.children.take((parent.children.length / 2).ceil()).toList();
       final rightChildren = parent.children.skip(leftChildren.length).toList();
 
       _assignChildrenToSide(leftChildren, parent, level, -1);
@@ -865,7 +865,7 @@ class _MindMapWidgetState extends State<MindMapWidget>
   void _assignVerticalLayout(MindMapNode parent, int level) {
     if (level == 0) {
       final topChildren =
-          parent.children.take((parent.children.length / 2).ceil()).toList();
+      parent.children.take((parent.children.length / 2).ceil()).toList();
       final bottomChildren = parent.children.skip(topChildren.length).toList();
 
       _assignChildrenVertically(topChildren, parent, level, -1);
@@ -888,16 +888,16 @@ class _MindMapWidgetState extends State<MindMapWidget>
 
   /// 한쪽으로 자식 노드들 배치 / Assign children to one side
   void _assignChildrenToSide(
-    List<MindMapNode> children,
-    MindMapNode parent,
-    int level,
-    int direction,
-  ) {
+      List<MindMapNode> children,
+      MindMapNode parent,
+      int level,
+      int direction,
+      ) {
     final dynamicSpacing = _calculateDynamicSpacing(parent, level);
     final x = parent.targetPosition.dx + direction * dynamicSpacing;
     double totalHeight = children.fold(
       0.0,
-      (sum, child) => sum + child.subtreeHeight,
+          (sum, child) => sum + child.subtreeHeight,
     );
 
     // 자식 노드들 사이의 추가 간격 적용
@@ -919,16 +919,16 @@ class _MindMapWidgetState extends State<MindMapWidget>
 
   /// 위아래로 자식 노드들 배치 / Assign children vertically
   void _assignChildrenVertically(
-    List<MindMapNode> children,
-    MindMapNode parent,
-    int level,
-    int direction,
-  ) {
+      List<MindMapNode> children,
+      MindMapNode parent,
+      int level,
+      int direction,
+      ) {
     final dynamicSpacing = _calculateDynamicSpacing(parent, level);
     final y = parent.targetPosition.dy + direction * dynamicSpacing;
     double totalWidth = children.fold(
       0.0,
-      (sum, child) => sum + child.subtreeWidth,
+          (sum, child) => sum + child.subtreeWidth,
     );
 
     // 자식 노드들 사이의 추가 간격 적용
@@ -1029,16 +1029,16 @@ class _MindMapWidgetState extends State<MindMapWidget>
 
     switch (widget.nodeExpandCameraBehavior) {
       case NodeExpandCameraBehavior.none:
-        // 카메라 이동 없음
+      // 카메라 이동 없음
         break;
 
       case NodeExpandCameraBehavior.focusClickedNode:
-        // 클릭한 노드로 포커스
+      // 클릭한 노드로 포커스
         _focusOnNodeById(node.id);
         break;
 
       case NodeExpandCameraBehavior.fitExpandedChildren:
-        // 새로 펼쳐진 자식 노드들만 보이도록 조정
+      // 새로 펼쳐진 자식 노드들만 보이도록 조정
         if (node.isExpanded && node.children.isNotEmpty) {
           _fitNodesToView(node.children);
         } else {
@@ -1047,7 +1047,7 @@ class _MindMapWidgetState extends State<MindMapWidget>
         break;
 
       case NodeExpandCameraBehavior.fitExpandedSubtree:
-        // 펼쳐진 전체 서브트리를 보이도록 조정
+      // 펼쳐진 전체 서브트리를 보이도록 조정
         _fitSubtreeToView(node);
         break;
     }
@@ -1088,9 +1088,9 @@ class _MindMapWidgetState extends State<MindMapWidget>
     final double ty = viewportCenterY - (targetPosition.dy * scale);
 
     final newTransform =
-        Matrix4.identity()
-          ..translate(tx, ty)
-          ..scale(scale);
+    Matrix4.identity()
+      ..translate(tx, ty)
+      ..scale(scale);
 
     // 부드러운 애니메이션으로 이동 (기존 focusAnimation 지속시간 사용)
     _animateToTransform(newTransform);
@@ -1128,7 +1128,7 @@ class _MindMapWidgetState extends State<MindMapWidget>
             final startPos = startPositions[child.id];
             if (startPos != null) {
               child.position =
-                  Offset.lerp(startPos, child.targetPosition, progress)!;
+              Offset.lerp(startPos, child.targetPosition, progress)!;
             }
           }
         }
@@ -1231,10 +1231,10 @@ class _MindMapWidgetState extends State<MindMapWidget>
         if (bounds != null) {
           final double scaleX =
               (viewportSize.width - widget.focusMargin.horizontal) /
-              bounds.width;
+                  bounds.width;
           final double scaleY =
               (viewportSize.height - widget.focusMargin.vertical) /
-              bounds.height;
+                  bounds.height;
           scale = math.min(scaleX, math.min(scaleY, widget.initialScale));
           scale = math.max(scale, widget.viewerOptions?.minScale ?? 0.1);
 
@@ -1273,9 +1273,9 @@ class _MindMapWidgetState extends State<MindMapWidget>
     final double ty = viewportCenterY - (targetPosition.dy * scale);
 
     final newTransform =
-        Matrix4.identity()
-          ..translate(tx, ty)
-          ..scale(scale);
+    Matrix4.identity()
+      ..translate(tx, ty)
+      ..scale(scale);
 
     // 애니메이션 또는 즉시 적용
     if (widget.focusAnimation.inMilliseconds > 0) {
@@ -1395,7 +1395,7 @@ class _MindMapWidgetState extends State<MindMapWidget>
 
       // 🎯 현재 스케일 유지 (확대/축소 없이 위치만 이동)
       final double currentScale =
-          _transformationController.value.getMaxScaleOnAxis();
+      _transformationController.value.getMaxScaleOnAxis();
 
       // 중심점 계산
       final Offset centerPosition = Offset(
@@ -1410,9 +1410,9 @@ class _MindMapWidgetState extends State<MindMapWidget>
       final double ty = viewportCenterY - (centerPosition.dy * currentScale);
 
       final newTransform =
-          Matrix4.identity()
-            ..translate(tx, ty)
-            ..scale(currentScale);
+      Matrix4.identity()
+        ..translate(tx, ty)
+        ..scale(currentScale);
 
       _animateToTransform(newTransform);
     });
@@ -1466,34 +1466,34 @@ class _MindMapWidgetState extends State<MindMapWidget>
   Widget build(BuildContext context) {
     final canvasSize =
         widget.canvasSize ??
-        Size(_actualCanvasSize.width, _actualCanvasSize.height);
+            Size(_actualCanvasSize.width, _actualCanvasSize.height);
     final viewerOptions =
         widget.viewerOptions ?? const InteractiveViewerOptions();
 
     // Wrap the full canvas in a RepaintBoundary if a captureKey is provided
     final mindMapContent =
-        (widget.captureKey != null)
-            ? RepaintBoundary(
-              key: widget.captureKey,
-              child: Container(
-                width: canvasSize.width,
-                height: canvasSize.height,
-                color: widget.style.backgroundColor,
-                child: CustomPaint(
-                  painter: MindMapPainter(_rootNode, widget.style),
-                  child: Stack(children: _buildAllNodes(_rootNode)),
-                ),
-              ),
-            )
-            : Container(
-              width: _actualCanvasSize.width,
-              height: _actualCanvasSize.height,
-              color: widget.style.backgroundColor,
-              child: CustomPaint(
-                painter: MindMapPainter(_rootNode, widget.style),
-                child: Stack(children: _buildAllNodes(_rootNode)),
-              ),
-            );
+    (widget.captureKey != null)
+        ? RepaintBoundary(
+      key: widget.captureKey,
+      child: Container(
+        width: canvasSize.width,
+        height: canvasSize.height,
+        color: widget.style.backgroundColor,
+        child: CustomPaint(
+          painter: MindMapPainter(_rootNode, widget.style),
+          child: Stack(children: _buildAllNodes(_rootNode)),
+        ),
+      ),
+    )
+        : Container(
+      width: _actualCanvasSize.width,
+      height: _actualCanvasSize.height,
+      color: widget.style.backgroundColor,
+      child: CustomPaint(
+        painter: MindMapPainter(_rootNode, widget.style),
+        child: Stack(children: _buildAllNodes(_rootNode)),
+      ),
+    );
 
     if (viewerOptions.enablePanAndZoom) {
       return InteractiveViewer(
@@ -1548,47 +1548,70 @@ class _MindMapWidgetState extends State<MindMapWidget>
     );
     final textSize = widget.style.getTextSize(node.level);
 
-    final nodeColor = node.color;
-    final textColor = node.textColor ?? widget.style.defaultTextStyle.color;
+    var nodeColor = node.color;
+    var textColor = node.textColor ?? widget.style.defaultTextStyle.color;
     final borderColor =
         node.borderColor ??
-        (isSelected ? widget.style.selectionBorderColor : Colors.white);
+            (isSelected ? widget.style.selectionBorderColor : Colors.white);
+
+    bool isTransparent = false;
+    if (node.level == 0 || node.level == 1) {
+      textColor = node.textColor ?? widget.style.defaultTextStyle.color;
+      nodeColor = node.color;
+      isTransparent = false;
+    } else {
+      textColor = Color(0xFF000000);
+      nodeColor = Colors.transparent;
+      isTransparent = true;
+    }
+
+    // if (nodeColor == Colors.transparent) {
+    //   //透明色时，去除阴影效果
+    //   textColor = Color(0xFF000000);
+    //   nodeColor = Colors.transparent;
+    //   isTransparent = true;
+    // } else {
+    //   textColor = node.textColor ?? widget.style.defaultTextStyle.color;
+    //   nodeColor = node.color;
+    //   isTransparent = false;
+    // }
+    print("标签的等级为${node.level}");
 
     return Positioned(
       key: ValueKey('positioned_${node.id}'),
       left: node.position.dx - actualSize.width / 2,
-      top: node.position.dy - actualSize.height / 2,
+      top: node.position.dy - (actualSize.height - 10) / 2,
       child: GestureDetector(
         onTap: () {
-          if (node.hasChildren) {
-            _toggleNode(node);
-          } else {
-            _selectNode(node);
-          }
+          // if (node.hasChildren) {
+          //   _toggleNode(node);
+          // } else {
+          //   _selectNode(node);
+          // }
         },
         onLongPress: () {
-          final originalData = _findOriginalData(node.id);
-          if (originalData != null) {
-            widget.onNodeLongPress?.call(originalData);
-          }
+          // final originalData = _findOriginalData(node.id);
+          // if (originalData != null) {
+          //   widget.onNodeLongPress?.call(originalData);
+          // }
         },
         onDoubleTap: () {
-          final originalData = _findOriginalData(node.id);
-          if (originalData != null) {
-            widget.onNodeDoubleTap?.call(originalData);
-          }
+          // final originalData = _findOriginalData(node.id);
+          // if (originalData != null) {
+          //   widget.onNodeDoubleTap?.call(originalData);
+          // }
         },
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           width: actualSize.width,
-          height: actualSize.height,
+          height: actualSize.height - 10,
           child: CustomPaint(
             painter: _NodeWidgetPainter(
               shape: widget.style.nodeShape,
               fillColor: nodeColor,
-              borderColor: borderColor,
+              borderColor: Colors.transparent,
               borderWidth: isSelected ? widget.style.selectionBorderWidth : 2.0,
-              shadowEnabled: widget.style.enableNodeShadow,
+              shadowEnabled: isTransparent ? false : widget.style.enableNodeShadow,
               shadowColor: widget.style.nodeShadowColor,
               shadowBlurRadius: widget.style.nodeShadowBlurRadius,
               shadowSpreadRadius: widget.style.nodeShadowSpreadRadius,
@@ -1598,7 +1621,7 @@ class _MindMapWidgetState extends State<MindMapWidget>
               children: [
                 Center(
                   child: Padding(
-                    padding: widget.style.textPadding,
+                    padding: EdgeInsets.all(0.0),
                     child: Text(
                       node.title,
                       textAlign: TextAlign.center,
@@ -1609,24 +1632,24 @@ class _MindMapWidgetState extends State<MindMapWidget>
                     ),
                   ),
                 ),
-                if (node.hasChildren)
-                  Positioned(
-                    right: 4,
-                    top: 4,
-                    child: Container(
-                      width: 16,
-                      height: 16,
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        node.isExpanded ? Icons.remove : Icons.add,
-                        size: 12,
-                        color: nodeColor,
-                      ),
-                    ),
-                  ),
+                // if (node.hasChildren)
+                //   Positioned(
+                //     right: 4,
+                //     top: 4,
+                //     child: Container(
+                //       width: 16,
+                //       height: 16,
+                //       decoration: const BoxDecoration(
+                //         color: Colors.white,
+                //         shape: BoxShape.circle,
+                //       ),
+                //       child: Icon(
+                //         node.isExpanded ? Icons.remove : Icons.add,
+                //         size: 12,
+                //         color: nodeColor,
+                //       ),
+                //     ),
+                //   ),
               ],
             ),
           ),
@@ -1665,22 +1688,22 @@ class _NodeWidgetPainter extends CustomPainter {
     final rect = Rect.fromLTWH(0, 0, size.width, size.height);
 
     final fillPaint =
-        Paint()
-          ..color = fillColor
-          ..style = PaintingStyle.fill;
+    Paint()
+      ..color = fillColor
+      ..style = PaintingStyle.fill;
 
     final borderPaint =
-        Paint()
-          ..color = borderColor
-          ..strokeWidth = borderWidth
-          ..style = PaintingStyle.stroke;
+    Paint()
+      ..color = borderColor
+      ..strokeWidth = borderWidth
+      ..style = PaintingStyle.stroke;
 
     if (shadowEnabled) {
       final shadowPaint =
-          Paint()
-            ..color = shadowColor
-            ..maskFilter = MaskFilter.blur(BlurStyle.normal, shadowBlurRadius)
-            ..style = PaintingStyle.fill;
+      Paint()
+        ..color = shadowColor
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, shadowBlurRadius)
+        ..style = PaintingStyle.fill;
 
       final shadowRect = rect.shift(shadowOffset);
       NodePainter.paintNode(

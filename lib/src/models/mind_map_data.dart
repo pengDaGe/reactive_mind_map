@@ -2,50 +2,32 @@ import 'package:flutter/material.dart';
 
 /// 마인드맵 노드 데이터를 나타내는 클래스
 class MindMapData {
-  /// 노드의 고유 식별자
   final String id;
-
-  /// 노드의 제목
   final String title;
-
-  /// 노드의 상세 설명
   final String description;
-
-  /// 하위 노드들
-  final List<MindMapData> children;
-
-  /// 노드의 색상 (null이면 기본 색상 사용)
+  List<MindMapData> children = [];
   final Color? color;
-
-  /// 노드의 텍스트 색상 (null이면 기본 색상 사용)
   final Color? textColor;
-
-  /// 노드의 테두리 색상 (null이면 기본 색상 사용)
   final Color? borderColor;
-
-  /// 노드의 텍스트 스타일 (null이면 기본 스타일 사용)
   final TextStyle? textStyle;
-
-  /// 노드의 크기 (null이면 레벨에 따른 기본 크기 사용)
   final Size? size;
-
-  /// 사용자 정의 데이터
   final Map<String, dynamic>? customData;
 
-  const MindMapData({
+  // 构造函数中，默认将 children 初始化为可变的空列表
+  MindMapData({
     required this.id,
     required this.title,
     this.description = '',
-    this.children = const [],
+    List<MindMapData>? children, // 允许传入可变列表
     this.color,
     this.textColor,
     this.borderColor,
     this.textStyle,
     this.size,
     this.customData,
-  });
+  }) : children = children ?? []; // 如果没有传入 children，则默认为可变的空列表
 
-  /// 데이터 복사를 위한 copyWith 메소드
+  // 数据复制方法
   MindMapData copyWith({
     String? id,
     String? title,

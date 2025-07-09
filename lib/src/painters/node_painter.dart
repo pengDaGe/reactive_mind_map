@@ -36,11 +36,11 @@ class NodePainter {
 
   /// 둥근 사각형 그리기
   static void _paintRoundedRectangle(
-    Canvas canvas,
-    Rect rect,
-    Paint fillPaint,
-    Paint? borderPaint,
-  ) {
+      Canvas canvas,
+      Rect rect,
+      Paint fillPaint,
+      Paint? borderPaint,
+      ) {
     final rrect = RRect.fromRectAndRadius(rect, const Radius.circular(12));
     canvas.drawRRect(rrect, fillPaint);
     if (borderPaint != null) {
@@ -50,11 +50,11 @@ class NodePainter {
 
   /// 원형 그리기
   static void _paintCircle(
-    Canvas canvas,
-    Rect rect,
-    Paint fillPaint,
-    Paint? borderPaint,
-  ) {
+      Canvas canvas,
+      Rect rect,
+      Paint fillPaint,
+      Paint? borderPaint,
+      ) {
     final center = rect.center;
     final radius = math.min(rect.width, rect.height) / 2;
     canvas.drawCircle(center, radius, fillPaint);
@@ -65,11 +65,11 @@ class NodePainter {
 
   /// 사각형 그리기
   static void _paintRectangle(
-    Canvas canvas,
-    Rect rect,
-    Paint fillPaint,
-    Paint? borderPaint,
-  ) {
+      Canvas canvas,
+      Rect rect,
+      Paint fillPaint,
+      Paint? borderPaint,
+      ) {
     canvas.drawRect(rect, fillPaint);
     if (borderPaint != null) {
       canvas.drawRect(rect, borderPaint);
@@ -78,11 +78,11 @@ class NodePainter {
 
   /// 다이아몬드 그리기
   static void _paintDiamond(
-    Canvas canvas,
-    Rect rect,
-    Paint fillPaint,
-    Paint? borderPaint,
-  ) {
+      Canvas canvas,
+      Rect rect,
+      Paint fillPaint,
+      Paint? borderPaint,
+      ) {
     final path = Path();
     final center = rect.center;
     final halfWidth = rect.width / 2;
@@ -102,11 +102,11 @@ class NodePainter {
 
   /// 육각형 그리기
   static void _paintHexagon(
-    Canvas canvas,
-    Rect rect,
-    Paint fillPaint,
-    Paint? borderPaint,
-  ) {
+      Canvas canvas,
+      Rect rect,
+      Paint fillPaint,
+      Paint? borderPaint,
+      ) {
     final path = Path();
     final center = rect.center;
     final size = math.min(rect.width, rect.height) / 2;
@@ -132,11 +132,11 @@ class NodePainter {
 
   /// 타원 그리기
   static void _paintEllipse(
-    Canvas canvas,
-    Rect rect,
-    Paint fillPaint,
-    Paint? borderPaint,
-  ) {
+      Canvas canvas,
+      Rect rect,
+      Paint fillPaint,
+      Paint? borderPaint,
+      ) {
     canvas.drawOval(rect, fillPaint);
     if (borderPaint != null) {
       canvas.drawOval(rect, borderPaint);

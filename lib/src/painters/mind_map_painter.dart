@@ -29,10 +29,10 @@ class MindMapPainter extends CustomPainter {
   /// 두 노드 사이의 연결선을 그리는 메소드
   void _drawConnection(Canvas canvas, MindMapNode parent, MindMapNode child) {
     final paint =
-        Paint()
-          ..color = style.connectionColor.withValues(alpha: 0.6)
-          ..strokeWidth = style.connectionWidth
-          ..style = PaintingStyle.stroke;
+    Paint()
+      ..color = style.connectionColor.withValues(alpha: 0.6)
+      ..strokeWidth = style.connectionWidth
+      ..style = PaintingStyle.stroke;
 
     if (style.useCustomCurve) {
       _drawCurvedConnection(canvas, parent, child, paint);
@@ -43,11 +43,11 @@ class MindMapPainter extends CustomPainter {
 
   /// 곡선 연결선 그리기
   void _drawCurvedConnection(
-    Canvas canvas,
-    MindMapNode parent,
-    MindMapNode child,
-    Paint paint,
-  ) {
+      Canvas canvas,
+      MindMapNode parent,
+      MindMapNode child,
+      Paint paint,
+      ) {
     final path = Path();
 
     // 레이아웃에 따라 연결점 계산
@@ -79,11 +79,11 @@ class MindMapPainter extends CustomPainter {
 
   /// 직선 연결선 그리기
   void _drawStraightConnection(
-    Canvas canvas,
-    MindMapNode parent,
-    MindMapNode child,
-    Paint paint,
-  ) {
+      Canvas canvas,
+      MindMapNode parent,
+      MindMapNode child,
+      Paint paint,
+      ) {
     final connectionPoints = _getConnectionPoints(parent, child);
     final startPoint = connectionPoints['start']!;
     final endPoint = connectionPoints['end']!;
@@ -93,9 +93,9 @@ class MindMapPainter extends CustomPainter {
 
   /// 레이아웃에 따른 연결점 계산
   Map<String, Offset> _getConnectionPoints(
-    MindMapNode parent,
-    MindMapNode child,
-  ) {
+      MindMapNode parent,
+      MindMapNode child,
+      ) {
     // 동적 크기 계산
     final parentSize = style.getActualNodeSize(
       parent.title,
@@ -115,7 +115,7 @@ class MindMapPainter extends CustomPainter {
 
     // 분할 레이아웃에서는 자식의 parentDirection을 기준으로 연결점 계산
     if ((style.layout == MindMapLayout.horizontal ||
-            style.layout == MindMapLayout.vertical) &&
+        style.layout == MindMapLayout.vertical) &&
         child.parentDirection != null) {
       switch (child.parentDirection) {
         case 'right':
@@ -159,7 +159,7 @@ class MindMapPainter extends CustomPainter {
           );
           break;
         default:
-          // 기본값: 각도 기반 계산
+        // 기본값: 각도 기반 계산
           final angle = math.atan2(
             child.position.dy - parent.position.dy,
             child.position.dx - parent.position.dx,
@@ -223,7 +223,7 @@ class MindMapPainter extends CustomPainter {
         case MindMapLayout.radial:
         case MindMapLayout.horizontal:
         case MindMapLayout.vertical:
-          // 각도 기반 연결점 계산
+        // 각도 기반 연결점 계산
           final angle = math.atan2(
             child.position.dy - parent.position.dy,
             child.position.dx - parent.position.dx,
@@ -245,11 +245,11 @@ class MindMapPainter extends CustomPainter {
 
   /// 베지어 곡선의 제어점 계산 / Calculate control points for Bezier curves
   Map<String, Offset> _getControlPoints(
-    Offset start,
-    Offset end,
-    MindMapNode parent,
-    MindMapNode child,
-  ) {
+      Offset start,
+      Offset end,
+      MindMapNode parent,
+      MindMapNode child,
+      ) {
     Offset control1, control2;
 
     // 노드 크기 고려 / Consider node sizes
@@ -302,7 +302,7 @@ class MindMapPainter extends CustomPainter {
         control2 = Offset(end.dx, end.dy - controlDistance);
         break;
       default:
-        // 기본값: 거리 기반 제어점 / Default: distance-based control points
+      // 기본값: 거리 기반 제어점 / Default: distance-based control points
         final midX = (start.dx + end.dx) / 2;
         final midY = (start.dy + end.dy) / 2;
         final controlOffset = controlDistance * 0.6;
@@ -333,7 +333,7 @@ class MindMapPainter extends CustomPainter {
       case MindMapLayout.horizontal:
       case MindMapLayout.vertical:
       case MindMapLayout.radial:
-        // 좌표 차이로 방향 판단 / Determine direction based on coordinate difference
+      // 좌표 차이로 방향 판단 / Determine direction based on coordinate difference
         final dx = end.dx - start.dx;
         final dy = end.dy - start.dy;
 

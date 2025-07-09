@@ -92,37 +92,37 @@ class MindMapNode {
 
   /// MindMapData로부터 MindMapNode를 생성하는 팩토리 메소드
   factory MindMapNode.fromData(
-    MindMapData data,
-    int level, {
-    List<Color>? defaultColors,
-  }) {
+      MindMapData data,
+      int level, {
+        List<Color>? defaultColors,
+      }) {
     final defaultNodeColors =
         defaultColors ??
-        [
-          const Color(0xFF2563EB),
-          const Color(0xFF7C3AED),
-          const Color(0xFF059669),
-          const Color(0xFFDC2626),
-          const Color(0xFFF59E0B),
-          const Color(0xFF7C2D12),
-          const Color(0xFF6B21A8),
-          const Color(0xFF0EA5E9),
-          const Color(0xFF10B981),
-          const Color(0xFF8B5CF6),
-          const Color(0xFF06B6D4),
-          const Color(0xFFF97316),
-        ];
+            [
+              Color(0xFF478DFF),
+              Color(0xFF000000),
+              Colors.transparent,
+              Colors.transparent,
+              Colors.transparent,
+              Colors.transparent,
+              Colors.transparent,
+              Colors.transparent,
+              Colors.transparent,
+              Colors.transparent,
+              Colors.transparent,
+              Colors.transparent,
+            ];
 
     final children =
-        data.children
-            .map(
-              (childData) => MindMapNode.fromData(
-                childData,
-                level + 1,
-                defaultColors: defaultColors,
-              ),
-            )
-            .toList();
+    data.children
+        .map(
+          (childData) => MindMapNode.fromData(
+        childData,
+        level + 1,
+        defaultColors: defaultColors,
+      ),
+    )
+        .toList();
 
     return MindMapNode(
       id: data.id,

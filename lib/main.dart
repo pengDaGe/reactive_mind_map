@@ -413,7 +413,6 @@ class _MyHomePageState extends State<MyHomePage> {
         id: '3',
         title: '💰 비즈니스 모델',
         description: '수익 창출 방안',
-        color: const Color(0xFF059669), // 녹색
         textColor: Colors.white,
         borderColor: const Color(0xFFFFD700), // 금색
         textStyle: const TextStyle(
@@ -430,7 +429,6 @@ class _MyHomePageState extends State<MyHomePage> {
             id: '3-1',
             title: '💳 구독 서비스',
             description: '월정액 모델',
-            color: const Color(0xFF7C2D12), // 갈색
             textColor: const Color(0xFFFEF3C7),
             textStyle: const TextStyle(
               fontSize: 13,
@@ -442,7 +440,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 id: '3-1-1',
                 title: '🥉 Basic',
                 description: '기본 플랜',
-                color: const Color(0xFF6B7280), // 회색
                 textColor: Colors.white,
                 size: const Size(80, 60),
               ),
@@ -450,7 +447,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 id: '3-1-2',
                 title: '🥈 Pro',
                 description: '프로 플랜',
-                color: const Color(0xFF374151), // 진회색
                 textColor: Colors.white,
                 size: const Size(75, 60),
               ),
@@ -458,7 +454,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 id: '3-1-3',
                 title: '🥇 Enterprise',
                 description: '기업용 플랜',
-                color: const Color(0xFF111827), // 거의 검정
                 textColor: const Color(0xFFFFD700), // 금색 텍스트
                 textStyle: const TextStyle(
                   fontSize: 12,
@@ -515,6 +510,29 @@ class _MyHomePageState extends State<MyHomePage> {
     ],
   );
 
+  // 간단한 테스트 데이터
+  final mindMapData = MindMapData(
+    id: 'root',
+    title: '🎯 메인',
+    children: [
+      MindMapData(
+        id: 'node1',
+        title: '📝 노드1',
+        children: [
+          MindMapData(id: 'sub1', title: '서브1'),
+          MindMapData(id: 'sub2', title: '서브2'),
+        ],
+      ),
+      MindMapData(id: 'node2', title: '🎨 노드2'),
+      MindMapData(id: 'node3', title: '🔧 노드3'),
+      MindMapData(
+        id: 'node4',
+        title: '🚀 노드4',
+        children: [MindMapData(id: 'final', title: '마지막')],
+      ),
+    ],
+  );
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -534,12 +552,12 @@ class _MyHomePageState extends State<MyHomePage> {
             },
             itemBuilder:
                 (context) =>
-                    MindMapLayout.values.map((layout) {
-                      return PopupMenuItem(
-                        value: layout,
-                        child: Text(_getLayoutName(layout)),
-                      );
-                    }).toList(),
+                MindMapLayout.values.map((layout) {
+                  return PopupMenuItem(
+                    value: layout,
+                    child: Text(_getLayoutName(layout)),
+                  );
+                }).toList(),
           ),
           PopupMenuButton<NodeShape>(
             icon: const Icon(Icons.category),
@@ -551,61 +569,61 @@ class _MyHomePageState extends State<MyHomePage> {
             },
             itemBuilder:
                 (context) =>
-                    NodeShape.values.map((shape) {
-                      return PopupMenuItem(
-                        value: shape,
-                        child: Text(_getShapeName(shape)),
-                      );
-                    }).toList(),
+                NodeShape.values.map((shape) {
+                  return PopupMenuItem(
+                    value: shape,
+                    child: Text(_getShapeName(shape)),
+                  );
+                }).toList(),
           ),
           PopupMenuButton<String>(
             icon: const Icon(Icons.tune),
             tooltip: '고급 설정',
             itemBuilder:
                 (context) => [
-                  PopupMenuItem(
-                    value: 'animation',
-                    child: Row(
-                      children: [
-                        Icon(
-                          _useCustomAnimation
-                              ? Icons.check_box
-                              : Icons.check_box_outline_blank,
-                        ),
-                        const SizedBox(width: 8),
-                        const Text('빠른 애니메이션'),
-                      ],
+              PopupMenuItem(
+                value: 'animation',
+                child: Row(
+                  children: [
+                    Icon(
+                      _useCustomAnimation
+                          ? Icons.check_box
+                          : Icons.check_box_outline_blank,
                     ),
-                  ),
-                  PopupMenuItem(
-                    value: 'shadows',
-                    child: Row(
-                      children: [
-                        Icon(
-                          _showNodeShadows
-                              ? Icons.check_box
-                              : Icons.check_box_outline_blank,
-                        ),
-                        const SizedBox(width: 8),
-                        const Text('노드 그림자'),
-                      ],
+                    const SizedBox(width: 8),
+                    const Text('빠른 애니메이션'),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: 'shadows',
+                child: Row(
+                  children: [
+                    Icon(
+                      _showNodeShadows
+                          ? Icons.check_box
+                          : Icons.check_box_outline_blank,
                     ),
-                  ),
-                  PopupMenuItem(
-                    value: 'connections',
-                    child: Row(
-                      children: [
-                        Icon(
-                          _useBoldConnections
-                              ? Icons.check_box
-                              : Icons.check_box_outline_blank,
-                        ),
-                        const SizedBox(width: 8),
-                        const Text('굵은 연결선'),
-                      ],
+                    const SizedBox(width: 8),
+                    const Text('노드 그림자'),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: 'connections',
+                child: Row(
+                  children: [
+                    Icon(
+                      _useBoldConnections
+                          ? Icons.check_box
+                          : Icons.check_box_outline_blank,
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 8),
+                    const Text('굵은 연결선'),
+                  ],
+                ),
+              ),
+            ],
             onSelected: (value) {
               setState(() {
                 switch (value) {
@@ -625,65 +643,45 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ),
       body: MindMapWidget(
-        data: _customTestData,
-        style: MindMapStyle(
-          layout: _selectedLayout,
-          nodeShape: _selectedShape,
-          animationDuration:
+          data: mindMapData,
+          style: MindMapStyle(
+              layout: _selectedLayout,
+              nodeShape: _selectedShape,
+              animationDuration:
               _useCustomAnimation
                   ? const Duration(milliseconds: 300)
                   : const Duration(milliseconds: 600),
-          animationCurve:
+              animationCurve:
               _useCustomAnimation ? Curves.easeInOut : Curves.easeOutCubic,
-          enableNodeShadow: _showNodeShadows,
-          nodeShadowColor: Colors.black.withValues(alpha: 0.3),
-          nodeShadowBlurRadius: 8,
-          nodeShadowSpreadRadius: 2,
-          nodeShadowOffset: const Offset(2, 4),
-          connectionWidth: _useBoldConnections ? 3.0 : 2.0,
-          connectionColor:
+              enableNodeShadow: _showNodeShadows,
+              nodeShadowColor: Colors.black.withValues(alpha: 0.3),
+              nodeShadowBlurRadius: 8,
+              nodeShadowSpreadRadius: 2,
+              nodeShadowOffset: const Offset(2, 4),
+              connectionWidth: _useBoldConnections ? 3.0 : 2.0,
+              connectionColor:
               _useBoldConnections
                   ? Colors.black87
                   : Colors.grey.withValues(alpha: 0.6),
-          useCustomCurve: true,
-          backgroundColor: Colors.grey[50]!,
-          levelSpacing: 160,
-          nodeMargin: 15,
-        ),
-        onNodeTap: (node) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('탭: ${node.title.replaceAll('\n', ' ')}'),
-              duration: const Duration(seconds: 1),
-            ),
-          );
-        },
-        onNodeLongPress: (node) {
-          showDialog(
-            context: context,
-            builder:
-                (context) => AlertDialog(
-                  title: Text(node.title.replaceAll('\n', ' ')),
-                  content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('ID: ${node.id}'),
-                      const SizedBox(height: 8),
-                      Text('설명: ${node.description}'),
-                      const SizedBox(height: 8),
-                      Text('자식 수: ${node.children.length}'),
-                    ],
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: const Text('닫기'),
-                    ),
-                  ],
-                ),
-          );
-        },
+              useCustomCurve: true,
+              backgroundColor: Colors.grey[50]!,
+              levelSpacing: 160,
+              nodeMargin: 15,
+              defaultNodeColors: [
+                Color(0xFF478DFF),
+                Color(0xFF000000),
+                Colors.transparent,
+                Colors.transparent,
+                Colors.transparent,
+                Colors.transparent,
+                Colors.transparent,
+                Colors.transparent,
+                Colors.transparent,
+                Colors.transparent,
+                Colors.transparent,
+                Colors.transparent,
+              ]
+          )
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -691,26 +689,26 @@ class _MyHomePageState extends State<MyHomePage> {
             context: context,
             builder:
                 (context) => AlertDialog(
-                  title: const Text('Reactive Mind Map Package'),
-                  content: const Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('🎨 완전한 커스터마이징'),
-                      Text('🎯 다양한 레이아웃'),
-                      Text('⚡ 부드러운 애니메이션'),
-                      Text('🖱️ 풍부한 인터랙션'),
-                      SizedBox(height: 16),
-                      Text('상단 메뉴에서 레이아웃과 모양을 변경해보세요!'),
-                    ],
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: const Text('확인'),
-                    ),
-                  ],
+              title: const Text('Reactive Mind Map Package'),
+              content: const Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('🎨 완전한 커스터마이징'),
+                  Text('🎯 다양한 레이아웃'),
+                  Text('⚡ 부드러운 애니메이션'),
+                  Text('🖱️ 풍부한 인터랙션'),
+                  SizedBox(height: 16),
+                  Text('상단 메뉴에서 레이아웃과 모양을 변경해보세요!'),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('확인'),
                 ),
+              ],
+            ),
           );
         },
         child: const Icon(Icons.info),
